@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name = 'mcfit',
-    version = '0.0.1',
+    version = '0.0.2',
     author = 'Yin Li',
     author_email = 'eelregit@gmail.com',
     description = 'Multiplicative convolutional fast integral transforms',
