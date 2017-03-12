@@ -151,10 +151,10 @@ class mcfit(object):
         fabs_r = fabs[iQ3:].mean()
         if fabs_l > fabs_m:
             print("left wing seems heavy: {:.2g} vs {:.2g}, "
-                    "change tilt".format(fabs_l, fabs_m))
+                    "change tilt and mind convergence".format(fabs_l, fabs_m))
         if fabs_m < fabs_r:
             print("right wing seems heavy: {:.2g} vs {:.2g}, "
-                    "change tilt".format(fabs_m, fabs_r))
+                    "change tilt and mind convergence".format(fabs_m, fabs_r))
 
         if fabs[0] > fabs[1]:
             print("left tail may blow up: {:.2g} vs {:.2g}, "
