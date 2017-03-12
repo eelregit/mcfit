@@ -37,18 +37,17 @@ where $K(xy)$ is the kernel function and $q$ is a power-law tilt parameter.
 And with $f(x)\propto x^{-q}$, $g(y)\propto y^q$, one is free to choose $q$.
 We can tilt $f(x)$ to balance $f$ at large and small $x$,
 in order to improve accuracy and reduce ringing.
-Optimally $f(x)$ is of the same order of magnitude at the two ends.
 
 The idea is to take advantage of the convolution theorem in $\ln x$ and $\ln y$.
 We approximate $f(x)$ with truncated Fourier series,
-and use the exact Fourier transform of the possibly oscillatory kernel,
-obtained analytically via Mellin transform.
-This algorithm performs the best if $f(x)$ is smooth and spans a large range
-in $x$, that is when $f$ can be accurately approximated by a sum of finite Fourier modes,
-and by some discretization unform in $\ln x$.
+and use the exact Fourier transform of the possibly oscillatory kernel.
+We can calculate the latter analytically via Mellin transform.
+This algorithm performs the best if $f$ can be accurately approximated
+by a sum of finite Fourier modes and logarithmically uniform discretization,
+that is when $f(x)$ is smooth and spans a large range in $\ln x$.
 
 
-\paragraph{Derivation} mostly follows \cite{Hamilton00}.
+\paragraph{Derivation} largely follows \cite{Hamilton00}.
 In Eq.~\eqref{IT} take $f(x)$ on $[\xmin, \xmax]$, impose periodicity
 $f(\xmax)=f(\xmin)$ in $\ln x$, and then discretize it by
 $\ln x_n\equiv\ln\xmin+n\Delta$ and $\ln\xmax/\xmin=N\Delta$.
@@ -115,8 +114,6 @@ where
 
 We should make $u_m$ periodic over $m\in\mathbb{Z}_N$, however
 $u_{-N/2}$ and $u_{N/2}$ are not necessarily equal for even $N$.
-%%% the following statement is probably wrong because we have assumed Nx=Ny
-%In such case, in principle one can expand to $\mathbb{Z}_{N+1}$
 In practice we can impose
 \begin{equation}
     \label{step3nolowring}
