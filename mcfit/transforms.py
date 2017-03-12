@@ -4,6 +4,7 @@ Common Integral transforms and applications
 ===========================================
 """
 
+from __future__ import division
 from .mcfit import mcfit
 from .kernels import *
 from numpy import pi
