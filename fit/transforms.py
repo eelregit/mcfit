@@ -18,7 +18,8 @@ class Hankel(fit):
         self.nu = nu
         UK = Mellin_BesselJ(nu)
         prefac = x**2
-        fit.__init__(self, x, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class SphericalBessel(fit):
@@ -29,7 +30,8 @@ class SphericalBessel(fit):
         self.nu = nu
         UK = Mellin_SphericalBesselJ(nu)
         prefac = x**3
-        fit.__init__(self, x, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class FourierSine(fit):
@@ -39,7 +41,8 @@ class FourierSine(fit):
     def __init__(self, x, q=0.5, **kwargs):
         UK = Mellin_FourierSine()
         prefac = x
-        fit.__init__(self, x, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class FourierCosine(fit):
@@ -49,7 +52,8 @@ class FourierCosine(fit):
     def __init__(self, x, q=0.5, **kwargs):
         UK = Mellin_FourierCosine()
         prefac = x
-        fit.__init__(self, x, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class TophatSmooth(fit):
@@ -60,7 +64,8 @@ class TophatSmooth(fit):
         self.d = d
         UK = Mellin_Tophat(d)
         prefac = x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
-        fit.__init__(self, x, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class GaussSmooth(fit):
@@ -71,4 +76,5 @@ class GaussSmooth(fit):
         self.d = d
         UK = Mellin_Gauss()
         prefac = x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
-        fit.__init__(self, x, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)

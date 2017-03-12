@@ -1,8 +1,7 @@
 import warnings
-from numpy import pi, abs, sign, ceil, exp, log, log2, angle, \
-                arange, zeros, concatenate, searchsorted, allclose
+from numpy import pi, abs, ceil, exp, log, log2, angle, \
+                array, arange, zeros, concatenate, searchsorted, allclose
 from numpy.fft import rfft, hfft
-from scipy.optimize import fsolve
 
 class fit(object):
     r"""Fast Integral Transform using the FFTLog [1]_[2]_ algorithm.
@@ -132,31 +131,17 @@ class fit(object):
         f = self.prefac * self.x**(-self.q) * F
         fabs = abs(f)
 
-        # reckon q range
-        iQ1, iQ2, iQ3 = searchsorted(fabs.cumsum(), arange(1,4) / 4 * fabs.sum())
-        assert 0 != iQ1 != iQ2 != iQ3 != self.Ndata, "checker giving up"
-        fabs0 = fabs[:iQ1].mean()
-        fabs1 = fabs[iQ1:iQ2].mean()
-        fabs2 = fabs[iQ2:iQ3].mean()
-        fabs3 = fabs[iQ3:].mean()
-        fabs_imba_l = fabs1 * (iQ2 - iQ1) / fabs0 / iQ1
-        fabs_imba_r = fabs3 * (self.Ndata - iQ3) / fabs2 / (iQ3 - iQ2)
-        def eqn_q_l(x):
-            return (exp(iQ2*x) - exp(iQ1*x)) / (exp(iQ1*x) - 1) - fabs_imba_l
-        x0_l = sign(fabs1 - fabs0) / iQ2
-        niceq_l = fsolve(eqn_q_l, x0_l)[0] / self.Delta + self.q
-        def eqn_q_r(x):
-            return (exp(self.Ndata*x) - exp(iQ3*x)) / (exp(iQ3*x) - exp(iQ2*x)) - fabs_imba_r
-        x0_r = sign(fabs3 - fabs2) / self.Ndata
-        niceq_r = fsolve(eqn_q_r, x0_r)[0] / self.Delta + self.q
-        if fabs0 > fabs1:
-            print("left wing seems heavy: {:.2g} vs {:.2g}".format(fabs0, fabs1))
-        if fabs2 < fabs3:
-            print("right wing seems heavy: {:.2g} vs {:.2g}".format(fabs2, fabs3))
-        print("tilt q ∊ ({:.2f}, {:.2f}) may balance well, "
-                "current choice q = {}".format(niceq_r, niceq_l, self.q))
-        if niceq_l < niceq_r:
-            warnings.warn("checker questioning convergence")
+        iQ1, iQ3 = searchsorted(fabs.cumsum(), array([0.25, 0.75]) * fabs.sum())
+        assert 0 != iQ1 != iQ3 != self.Ndata, "checker giving up"
+        fabs_l = fabs[:iQ1].mean()
+        fabs_m = fabs[iQ1:iQ3].mean()
+        fabs_r = fabs[iQ3:].mean()
+        if fabs_l > fabs_m:
+            print("left wing seems heavy: {:.2g} vs {:.2g}, "
+                    "change tilt".format(fabs_l, fabs_m))
+        if fabs_m < fabs_r:
+            print("right wing seems heavy: {:.2g} vs {:.2g}, "
+                    "change tilt".format(fabs_m, fabs_r))
 
         if fabs[0] > fabs[1]:
             print("left tail may blow up: {:.2g} vs {:.2g}, "

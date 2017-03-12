@@ -17,7 +17,8 @@ class P2xi(fit):
         self.l = l
         UK = Mellin_SphericalBesselJ(l)
         prefac = real_if_close(1j**l) * x**3 / (2*pi)**1.5
-        fit.__init__(self, k, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class xi2P(fit):
@@ -40,7 +41,8 @@ class TophatVar(fit):
     def __init__(self, k, q=1.5, **kwargs):
         UK = Mellin_TophatSq(3)
         prefac = k**3 / (2 * pi**2)
-        fit.__init__(self, k, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class GaussVar(fit):
@@ -50,7 +52,8 @@ class GaussVar(fit):
     def __init__(self, k, q=1.5, **kwargs):
         UK = Mellin_GaussSq()
         prefac = k**3 / (2 * pi**2)
-        fit.__init__(self, k, UK, q, prefac=prefac, **kwargs)
+        postfac = 1
+        fit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
 class ExcursionSet(fit):
