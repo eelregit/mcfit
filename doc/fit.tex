@@ -349,7 +349,7 @@ We test our implementation on Hankel transform in the following analytic case
 \paragraph{Parameters}
 
 
-\subparagraph{Resolution: $N$ and $\Delta$}
+\subparagraph{Length: $N$}
 Odd $N$ has worse ringing problem, similar to the case without low-ringing condition.
 
 
@@ -361,28 +361,9 @@ However, one should not use a tilt too large, as it tends to shift the focus awa
 and thus reduces the accuracy on the interested scales.
 
 
-\subparagraph{Range: $\xmin$, $\xmax$, $\ymin$, and $\ymax$,}
-only 3 of which are free due to constraint
-\begin{equation}
-    \frac\xmax\xmin = \frac\ymax\ymin
-\end{equation}
-The range includes padded regions specified below.
-Low-ringing condition makes significant improvement.
-
-
 \subparagraph{Padding:}
-%\begin{equation}
-%    f(x) \to \begin{cases}
-%        f(x) \exp(-\alpha^2\ln^2x/\xlo) & \xmin\leq x<\xlo  \\
-%        f(x) & \xlo\leq x<\xhi  \\
-%        f(x) \exp(-\beta^2\ln^2x/\xhi) & \xhi\leq x<\xmax
-%    \end{cases}
-%\end{equation}
-%where $f(x)$ is tabulated within $[\xlo, \xhi]$, and is undefined but extrapolated outside
-%by power law from the end segments. The suppression $\alpha$ and $\beta$ default to 0.
-%\emph{The suppression feature is removed, only extrapolation is done.}
 $f(x)$ is padded either with power-law extrapolations from the end segments
-beyond the tabulated region, or with zeros.
+beyond the tabulated region, or just with zeros.
 
 
 \paragraph{Gamma function}
