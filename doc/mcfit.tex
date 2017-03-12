@@ -16,16 +16,15 @@
 
 
 \begin{document}
-\title{Fast Integral Transforms}
+\title{\texttt{mcfit}: Multiplicative Convolutional Fast Integral Transforms}
 \author{Yin Li}
 \date{Mar. 2017}
 \maketitle
 
 
-This library computes common integral transforms
-with product kernels using the FFTLog algorithm \cite{Talman78,Hamilton00}
+This package computes integral transforms with product kernels
+using the FFTLog algorithm \cite{Talman78,Hamilton00}
 \begin{equation}
-    \label{IT}
     G(y) = \int_0^\infty F(x) K(xy) \,\frac{\d x}x
 \end{equation}
 or equivalently
@@ -373,5 +372,5 @@ The reflection and duplication formulae are useful for playing with the gamma fu
 
 
 \bibliographystyle{alpha}
-\bibliography{fit.bib}
+\bibliography{mcfit.bib}
 \end{document}

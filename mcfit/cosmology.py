@@ -4,12 +4,12 @@ Cosmology applications
 ======================
 """
 
-from .fit import fit
+from .mcfit import mcfit
 from .kernels import *
 from numpy import pi, real_if_close
 
 
-class P2xi(fit):
+class P2xi(mcfit):
     """
     Power spectrum to correlation function
     """
@@ -18,10 +18,10 @@ class P2xi(fit):
         UK = Mellin_SphericalBesselJ(l)
         prefac = real_if_close(1j**l) * x**3 / (2*pi)**1.5
         postfac = 1
-        fit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class xi2P(fit):
+class xi2P(mcfit):
     """
     Correlation function to power spectrum
     Also radial profile to its Fourier transform
@@ -31,10 +31,10 @@ class xi2P(fit):
         UK = Mellin_SphericalBesselJ(l)
         prefac = x**3
         postfac = (2*pi)**1.5 / real_if_close(1j**l)
-        fit.__init__(self, r, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, r, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class TophatVar(fit):
+class TophatVar(mcfit):
     """
     Variance in a top-hat window
     """
@@ -42,10 +42,10 @@ class TophatVar(fit):
         UK = Mellin_TophatSq(3)
         prefac = k**3 / (2 * pi**2)
         postfac = 1
-        fit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class GaussVar(fit):
+class GaussVar(mcfit):
     """
     Variance in a Gaussian window
     """
@@ -53,10 +53,10 @@ class GaussVar(fit):
         UK = Mellin_GaussSq()
         prefac = k**3 / (2 * pi**2)
         postfac = 1
-        fit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, k, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class ExcursionSet(fit):
+class ExcursionSet(mcfit):
     """
     Excursion set trajectory
     BCEK 91 model

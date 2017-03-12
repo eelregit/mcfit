@@ -1,4 +1,4 @@
-from .fit import fit
+from .mcfit import mcfit
 from .transforms import *
 
 from numpy.testing import Tester

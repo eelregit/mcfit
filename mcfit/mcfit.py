@@ -2,15 +2,15 @@ from numpy import pi, abs, ceil, exp, log, log2, angle, \
                 array, arange, zeros, concatenate, searchsorted, allclose
 from numpy.fft import rfft, hfft
 
-class fit(object):
-    r"""Fast Integral Transform using the FFTLog [1]_[2]_ algorithm.
+class mcfit(object):
+    r"""Multiplicative Convolutional Fast Integral Transform
 
     Compute integral transforms of the form
 
     .. math:: G(y) = \int_0^\infty F(x) K(xy) \,\frac{\mathrm{d}x}x
     .. math:: g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\mathrm{d}x}x
 
-    using FFTLog, where :math:`K` is a kernel function.
+    using the FFTLog [1]_[2]_ algorithm.
 
     Parameters
     ----------
@@ -49,16 +49,18 @@ class fit(object):
     G : float, array_like
         output function tabulated at y, internal paddings are discarded before output
 
-    Example
-    -------
+    Examples
+    --------
     >>> x = numpy.logspace(-3, 3, num=60, endpoint=False)
     >>> F = 1 / (1 + x*x)**1.5
-    >>> H = fit(x, fit.kernels.Mellin_BesselJ(0), q=1)
-    >>> # more convenient to use the Hankel subclass from fit.tranforms
+    >>> H = mcfit(x, mcfit.kernels.Mellin_BesselJ(0), q=1)
     >>> H.check(F)
     >>> y, G = H(F)
     >>> Gexact = exp(-y)
     >>> allclose(G, Gexact)
+
+    more conveniently, use the Hankel subclass
+    >>> y, G = mcfit.transforms.Hankel(x)(F)
 
     References
     ----------

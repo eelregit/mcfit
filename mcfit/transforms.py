@@ -4,13 +4,13 @@ Common Integral transforms and applications
 ===========================================
 """
 
-from .fit import fit
+from .mcfit import mcfit
 from .kernels import *
 from numpy import pi
 from scipy.special import gamma
 
 
-class Hankel(fit):
+class Hankel(mcfit):
     """
     Hankel transform pair
     """
@@ -19,10 +19,10 @@ class Hankel(fit):
         UK = Mellin_BesselJ(nu)
         prefac = x**2
         postfac = 1
-        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class SphericalBessel(fit):
+class SphericalBessel(mcfit):
     """
     Spherical Bessel transform pair
     """
@@ -31,10 +31,10 @@ class SphericalBessel(fit):
         UK = Mellin_SphericalBesselJ(nu)
         prefac = x**3
         postfac = 1
-        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class FourierSine(fit):
+class FourierSine(mcfit):
     """
     Fourier sine transform pair
     """
@@ -42,10 +42,10 @@ class FourierSine(fit):
         UK = Mellin_FourierSine()
         prefac = x
         postfac = 1
-        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class FourierCosine(fit):
+class FourierCosine(mcfit):
     """
     Fourier cosine transform pair
     """
@@ -53,10 +53,10 @@ class FourierCosine(fit):
         UK = Mellin_FourierCosine()
         prefac = x
         postfac = 1
-        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class TophatSmooth(fit):
+class TophatSmooth(mcfit):
     """
     Top-hat smoothing of a radial function
     """
@@ -65,10 +65,10 @@ class TophatSmooth(fit):
         UK = Mellin_Tophat(d)
         prefac = x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
         postfac = 1
-        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
 
 
-class GaussSmooth(fit):
+class GaussSmooth(mcfit):
     """
     Gaussian smoothing of a radial function
     """
@@ -77,4 +77,4 @@ class GaussSmooth(fit):
         UK = Mellin_Gauss()
         prefac = x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
         postfac = 1
-        fit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
+        mcfit.__init__(self, x, UK, q, prefac=prefac, postfac=postfac, **kwargs)
