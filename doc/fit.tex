@@ -1,0 +1,398 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[margin=2cm]{geometry}
+\usepackage{hyperref}
+
+
+\renewcommand{\d}{\mathrm{d}}
+\newcommand{\xmin}{x_\textrm{min}}
+\newcommand{\xmax}{x_\textrm{max}}
+\newcommand{\ymin}{y_\textrm{min}}
+\newcommand{\ymax}{y_\textrm{max}}
+\newcommand{\Nhalf}{\lfloor N/2\rfloor} 
+\newcommand{\Tophat}{\textrm{T}} 
+\newcommand{\Gauss}{\textrm{G}} 
+
+
+\begin{document}
+\title{Fast Integral Transforms}
+\author{Yin Li}
+\date{Mar. 2017}
+\maketitle
+
+
+This library computes common integral transforms
+with product kernels using the FFTLog algorithm \cite{Talman78,Hamilton00}
+\begin{equation}
+    \label{IT}
+    G(y) = \int_0^\infty F(x) K(xy) \,\frac{\d x}x
+\end{equation}
+or equivalently
+\begin{equation}
+    \label{IT}
+    g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\d x}x
+\end{equation}
+where $K(xy)$ is the kernel function and $q$ is a power-law tilt parameter.
+And with $f(x)\propto x^{-q}$, $g(y)\propto y^q$, one is free to choose $q$.
+We can tilt $f(x)$ to balance $f$ at large and small $x$,
+in order to improve accuracy and reduce ringing.
+Optimally $f(x)$ is of the same order of magnitude at the two ends.
+
+The idea is to take advantage of the convolution theorem in $\ln x$ and $\ln y$.
+We approximate $f(x)$ with truncated Fourier series,
+and use the exact Fourier transform of the possibly oscillatory kernel,
+obtained analytically via Mellin transform.
+This algorithm performs the best if $f(x)$ is smooth and spans a large range
+in $x$, that is when $f$ can be accurately approximated by a sum of finite Fourier modes,
+and by some discretization unform in $\ln x$.
+
+
+\paragraph{Derivation} mostly follows \cite{Hamilton00}.
+In Eq.~\eqref{IT} take $f(x)$ on $[\xmin, \xmax]$, impose periodicity
+$f(\xmax)=f(\xmin)$ in $\ln x$, and then discretize it by
+$\ln x_n\equiv\ln\xmin+n\Delta$ and $\ln\xmax/\xmin=N\Delta$.
+The logarithmic interval $\Delta\equiv|\Delta\ln x|\equiv|\Delta\ln y|$
+uniformly discretizes $\ln x$ and later also $\ln y$,
+i.e., $\ln y_n\equiv\ln\ymin+n\Delta$ and $\ln\ymax/\ymin=N\Delta$.
+
+Define a symmetrized sum
+\begin{equation}
+    {\sum_n}' a_n \equiv \sum_{m=-\Nhalf}^{\Nhalf} w_n a_n
+\end{equation}
+with $w_n=1$ except that $w_{-N/2}=w_{N/2}=1/2$ if N is even.
+Using this and the fact that $f_m$ and $f(x_n)$ are periodic over $m,n\in\mathbb{Z}_N$,
+let's rewrite the usual discrete Fourier transform
+\begin{align}
+    f(x_n) &= \frac1N \sum_{m=0}^{N-1} f_m \exp\Bigl(\frac{i2\pi mn}N\Bigr)
+    = \frac1N {\sum_m}' f_m \exp\Bigl(\frac{i2\pi mn}N\Bigr)
+    = \frac1N {\sum_m}' f_m \exp\Bigl[\frac{i2\pi m\ln(x_n/\xmin)}{N\Delta}\Bigr]  \\
+    \label{step1}
+    f_m &= \sum_{n=0}^{N-1} f(x_n) \exp\Bigl(-\frac{i2\pi mn}N\Bigr)
+    = {\sum_n}' f(x_n) \exp\Bigl(-\frac{i2\pi mn}N\Bigr)
+\end{align}
+For smooth $f(x)$, a good approximation is the truncated Fourier series
+with $f_m$ as coefficients
+\begin{equation}
+    f(x) \approx \frac1N {\sum_m}' f_m \exp\Bigl[\frac{i2\pi m\ln(x/\xmin)}{N\Delta}\Bigr]
+\end{equation}
+always real thanks to the symmetrized sum.
+
+To evaluate Eq.~\eqref{IT} we can transform each Fourier mode
+\begin{align}
+    &\int_0^\infty \exp\Bigl[\frac{i2\pi m\ln(x/\xmin)}{N\Delta}\Bigr]
+        (xy)^q K(xy) \,\frac{\d x}x  \\
+    = &\int_0^\infty \exp\biggl\{\frac{i2\pi m}{N\Delta}
+        \Bigl[\ln(xy)-\ln\Bigl(\frac{y}{\ymin}\Bigr)
+            +\ln\Bigl(\frac{\ymax}{\ymin}\Bigr)-\ln(\xmin\ymax)\Bigr]
+    \biggr\} (xy)^q K(xy) \,\frac{\d x}x  \\
+    = &\exp\biggl\{-\frac{i2\pi m}{N\Delta}
+        \Bigl[\ln\Bigl(\frac{y}{\ymin}\Bigr)+\ln(\xmin\ymax)\Bigr]
+    \biggr\} \int_0^\infty t^{q-1+i\tfrac{2\pi m}{N\Delta}} K(t) \,\d t
+\end{align}
+Finally we just need to calculate analytically
+the Fourier transform of the kernel including the tilt factor,
+as a Mellin transform
+\begin{equation}
+    \label{Mellin}
+    U_K(z) \equiv \int_0^\infty t^{z-1} K(t) \,\d t
+\end{equation}
+which satisfies $U_K^*(z)=U_K(z^*)$, and derive
+\begin{align}
+    g(y) &\approx \frac1N {\sum_m}' g_m \exp\Bigl[-\frac{i2\pi m\ln(y/\ymin)}{N\Delta}\Bigr]  \\
+    \label{step6}
+    g(y_n) &\approx \frac1N {\sum_m}' g_m \exp\Bigl[-\frac{i2\pi m\ln(y_n/\ymin)}{N\Delta}\Bigr]
+    = \frac1N \sum_{m=0}^{N-1} g_m \exp\Bigl(-\frac{i2\pi mn}N\Bigr)
+\end{align}
+where
+\begin{align}
+    \label{step5}
+    g_m &= f_m u_m  \\
+    \label{step4}
+    u_m &= \exp\Bigl[-\frac{i2\pi m\ln(\xmin\ymax)}{N\Delta}\Bigr]
+    U_K\Bigl(q+i\frac{2\pi m}{N\Delta}\Bigr) \qquad -\Nhalf\leq m\leq\Nhalf
+\end{align}
+
+We should make $u_m$ periodic over $m\in\mathbb{Z}_N$, however
+$u_{-N/2}$ and $u_{N/2}$ are not necessarily equal for even $N$.
+%%% the following statement is probably wrong because we have assumed Nx=Ny
+%In such case, in principle one can expand to $\mathbb{Z}_{N+1}$
+In practice we can impose
+\begin{equation}
+    \label{step3nolowring}
+    g_{\pm N/2} \to \Re(g_{N/2}) \qquad N\in2\mathbb{Z}
+\end{equation}
+which is automatically satisfied if
+\begin{equation}
+    \label{step3lowring}
+    \ln(\xmin\ymax) = \frac\Delta\pi \mathrm{Arg} U_K\Bigl(q+i\frac\pi\Delta\Bigr)
+    + \textrm{integer} \cdot \Delta
+\end{equation}
+where the argument takes its principal value in $(-\pi,\pi]$
+and we set the arbitrary integer to 0.
+Otherwise we can just set $\xmin\ymax=1$ for convenience.
+
+
+\paragraph{Algorithm}
+Follow the steps in equations \eqref{step1}, \eqref{Mellin},
+\eqref{step3lowring} (or \eqref{step3nolowring}), \eqref{step4}, \eqref{step5},
+and \eqref{step6} for fast evaluation of Eq.~\eqref{IT}.
+$u_m$ from Eq.~\eqref{step4} should be saved for multiple transformations.
+
+
+\paragraph{Common Integral Transforms:}
+
+
+\subparagraph{Hankel transform pair}
+\begin{equation}
+    G(y) = \int_0^\infty F(x) J_\nu(xy) \,x\d x
+\end{equation}
+\begin{align}
+    f(x) &\to x^{2-q}F(x)  \\
+    g(y) &\to y^q G(y)  \\
+    K(t) &\to J_\nu(t)  \\
+    U_K(z) &= 2^{z-1} \frac{\Gamma\bigl(\frac{\nu+z}2\bigr)}{\Gamma\bigl(\frac{2+\nu-z}2\bigr)}
+\end{align}
+The pair is symmetric when $q=1$.
+
+
+\subparagraph{Spherical Bessel transform pair}
+\begin{equation}
+    G(y) = \sqrt\frac2\pi \int_0^\infty F(x) j_\nu(xy) \,x^2\d x
+\end{equation}
+\begin{align}
+    f(x) &\to x^{3-q} F(x)  \\
+    g(y) &\to y^q G(y)  \\
+    K(t) &\to \sqrt\frac2\pi j_\nu(t) = \frac{J_{\nu+\frac12}(t)}{\sqrt t}  \\
+    U_K(z) &= 2^{z-\frac32} \frac{\Gamma\bigl(\frac{\nu+z}2\bigr)}{\Gamma\bigl(\frac{3+\nu-z}2\bigr)}
+\end{align}
+The pair is symmetric when $q=\frac32$.
+
+
+\subparagraph{Fourier sine transform pair}
+\begin{equation}
+    G(y) = \sqrt\frac2\pi \int_0^\infty F(x) \sin(xy) \,\d x
+\end{equation}
+\begin{align}
+    f(x) &\to x^{1-q} F(x)  \\
+    g(y) &\to y^q G(y)  \\
+    K(t) &\to \sqrt\frac2\pi \sin(t) = \sqrt t J_\frac12(t)  \\
+    U_K(z) &= \sqrt\frac2\pi \Gamma(z) \sin\bigl(\frac{\pi z}2\bigr)
+    = 2^{z-\frac12} \frac{\Gamma\bigl(\frac{1+z}2\bigr)}{\Gamma\bigl(\frac{2-z}2\bigr)}
+\end{align}
+The pair is symmetric when $q=\frac12$.
+
+
+\subparagraph{Fourier cosine transform pair}
+\begin{equation}
+    G(y) = \sqrt\frac2\pi \int_0^\infty F(x) \cos(xy) \,\d x
+\end{equation}
+\begin{align}
+    f(x) &\to x^{1-q} F(x)  \\
+    g(y) &\to y^q G(y)  \\
+    K(t) &\to \sqrt\frac2\pi \cos(t) = \sqrt t J_{-\frac12}(t)  \\
+    U_K(z) &= \sqrt\frac2\pi \Gamma(z) \cos\bigl(\frac{\pi z}2\bigr)
+    = 2^{z-\frac12} \frac{\Gamma\bigl(\frac{z}2\bigr)}{\Gamma\bigl(\frac{1-z}2\bigr)}
+\end{align}
+The pair is symmetric when $q=\frac12$.
+
+
+\paragraph{Applications}
+
+
+\subparagraph{Top-hat smoothing of a radial function}
+in $\mathbb{R}^d$
+\begin{equation}
+    F^W(R) = \int_0^\infty \frac{k^dF(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}
+                    W_\Tophat(kR) \,\frac{\d k}k
+\end{equation}
+where
+\begin{align}
+    W_\Tophat(r) &= \begin{cases}
+        1 & r\leq R \\
+        0 & r > R
+    \end{cases} \\
+    W_\Tophat(kR) &= \frac{2^\frac{d}2\Gamma\bigl(\frac{d}2+1\bigr)J_\frac{d}2(kR)}{(kR)^{d/2}}
+\end{align}
+\begin{align}
+    x &\to k  \\
+    y &\to R  \\
+    f(x) &\to \frac{k^{d-q}F(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}  \\
+    g(y) &\to R^q F^W(R)  \\
+    K(t) &\to W_\Tophat(t)  \\
+    U_K(z) &= 2^{z-1} \frac{\Gamma\bigl(\frac{2+d}2\bigr)\Gamma\bigl(\frac{z}2\bigr)}
+                        {\Gamma\bigl(\frac{2+d-z}2\bigr)}
+\end{align}
+
+
+\subparagraph{Gaussian smoothing of a radial function}
+in $\mathbb{R}^d$
+\begin{equation}
+    F^W(R) = \int_0^\infty \frac{k^dF(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}
+                    W_\Gauss(kR) \,\frac{\d k}k
+\end{equation}
+where
+\begin{align}
+    W_\Gauss(r) &= \frac1{(2\pi R^2)^\frac{d}2} \exp\Bigl(-\frac{r^2}{2R^2}\Bigr)  \\
+    W_\Gauss(kR) &= \exp\Bigl(-\frac{k^2R^2}2\Bigr)
+\end{align}
+\begin{align}
+    x &\to k  \\
+    y &\to R  \\
+    f(x) &\to \frac{k^{d-q}F(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}  \\
+    g(y) &\to R^q F^W(R)  \\
+    K(t) &\to W_\Gauss(t)  \\
+    U_K(z) &= 2^{\frac{z}2-1} \Gamma\bigl(\tfrac{z}2\bigr)
+\end{align}
+
+
+\paragraph{Cosmology applications}
+
+
+\subparagraph{Power spectrum to correlation function}
+\begin{equation}
+    \xi_l(r) = i^l \int_0^\infty \frac{k^3P_l(k)}{2\pi^2} j_l(kr) \,\frac{\d k}k
+\end{equation}
+\begin{align}
+    x &\to k  \\
+    y &\to r  \\
+    f(x) &\to \frac{i^l k^{3-q} P_l(k)}{(2\pi)^\frac32}  \\
+    g(y) &\to r^q \xi_l(r)
+\end{align}
+with the rest the same as the spherical Bessel transform.
+
+
+\subparagraph{Correlation function to power spectrum}
+\begin{equation}
+    P_l(k) = (-i)^l \int_0^\infty 4\pi r^3\xi_l(r) j_l(kr) \,\frac{\d r}r
+\end{equation}
+\begin{align}
+    x &\to r  \\
+    y &\to k  \\
+    f(x) &\to r^{3-q} \xi_l(r)  \\
+    g(y) &\to \frac{i^l k^q P_l(k)}{(2\pi)^\frac32}
+\end{align}
+with the rest the same as the spherical Bessel transform.
+The 2-pt function conversion pair is symmetric when $q=\frac32$.
+
+
+\subparagraph{Variance in a Top-hat window}
+in $\mathbb{R}^3$
+\begin{equation}
+    \sigma_\Tophat^2(R) = \int_0^\infty \frac{k^3P(k)}{2\pi^2} W_\Tophat^2(kR) \,\frac{\d k}k
+\end{equation}
+where
+\begin{equation}
+    W_\Tophat(t) = \frac3{t^3}(\sin t - t\cos t) = \frac{3j_1(t)}t
+\end{equation}
+\begin{align}
+    x &\to k  \\
+    y &\to R  \\
+    f(x) &\to \frac{k^{3-q}P(k)}{2\pi^2}  \\
+    g(y) &\to R^q \sigma_\Tophat^2(R)  \\
+    K(t) &\to W_\Tophat^2(t)  \\
+    U_K(z) &= \frac{9\sqrt{\pi}(z-2)}{4(z-6)}
+        \frac{\Gamma\bigl(\frac{z-4}2\bigr)}{\Gamma\bigl(\frac{5-z}2\bigr)}
+\end{align}
+
+
+\subparagraph{Variance in a Gaussian window}
+in $\mathbb{R}^3$
+\begin{equation}
+    \sigma_\Gauss^2(R) = \int_0^\infty \frac{k^3P(k)}{2\pi^2} W_\Gauss^2(kR) \,\frac{\d k}k
+\end{equation}
+where
+\begin{equation}
+    W_\Gauss(kR) = \exp\Bigl(-\frac{k^2R^2}2\Bigr)
+\end{equation}
+\begin{align}
+    x &\to k  \\
+    y &\to R  \\
+    f(x) &\to \frac{k^{3-q}P(k)}{2\pi^2}  \\
+    g(y) &\to R^q \sigma_\Gauss^2(R)  \\
+    K(t) &\to W_\Gauss^2(t)  \\
+    U_K(z) &= \frac12 \Gamma\bigl(\frac{z}2\bigr)
+\end{align}
+
+
+\subparagraph{Excursion set}
+in $\mathbb{R}^3$
+\begin{equation}
+    \delta^W(R) = \int_0^\infty \frac{k^3\delta(k)}{2\pi^2} W_\Tophat(kR) \,\frac{\d k}k
+\end{equation}
+same as top-hat smoothing of a radial function given previously.
+\begin{align}
+    x &\to k  \\
+    y &\to R  \\
+    f(x) &\to \frac{k^{3-q}\delta(k)}{2\pi^2}  \\
+    g(y) &\to R^q \delta^W(R)  \\
+    K(t) &\to W_\Tophat(t)  \\
+    U_K(z) &= 3\sqrt\pi 2^{z-3}
+            \frac{\Gamma\bigl(\frac{z}2\bigr)}{\Gamma\bigl(\frac{5-z}2\bigr)}
+\end{align}
+Note that $\delta(k)$ is random and not smooth.
+
+
+\paragraph{Test}
+We test our implementation on Hankel transform in the following analytic case
+%\begin{equation}
+%    \int_0^\infty x^p e^{-x} J_\mu(xy) \,y\d x
+%    = \frac{y^{1+\mu}}{2^\mu} \frac{\Gamma(1+\mu+p)}{\Gamma(1+\mu)}
+%    \,_2F_1\bigl(\frac{1+\mu+p}2, \frac{2+\mu+p}2, 1+\mu; -y^2\bigr)
+%\end{equation}
+\begin{align}
+    e^{-y} &= \int_0^\infty (1+x^2)^\frac32 J_0(xy) \,x\d x  \\
+    (1+y^2)^\frac32 &= \int_0^\infty e^{-y} J_0(xy) \,x\d x
+\end{align}
+
+
+\paragraph{Parameters}
+
+
+\subparagraph{Resolution: $N$ and $\Delta$}
+Odd $N$ has worse ringing problem, similar to the case without low-ringing condition.
+
+
+\subparagraph{Tilt: $q$}
+We can reduce ringing by balancing the large and small scale amplitudes with the tilt.
+The gamma function has simple poles at the non-positive integers,
+which can be avoided by picking $q$.
+However, one should not use a tilt too large, as it tends to shift the focus away
+and thus reduces the accuracy on the interested scales.
+
+
+\subparagraph{Range: $\xmin$, $\xmax$, $\ymin$, and $\ymax$,}
+only 3 of which are free due to constraint
+\begin{equation}
+    \frac\xmax\xmin = \frac\ymax\ymin
+\end{equation}
+The range includes padded regions specified below.
+Low-ringing condition makes significant improvement.
+
+
+\subparagraph{Padding:}
+%\begin{equation}
+%    f(x) \to \begin{cases}
+%        f(x) \exp(-\alpha^2\ln^2x/\xlo) & \xmin\leq x<\xlo  \\
+%        f(x) & \xlo\leq x<\xhi  \\
+%        f(x) \exp(-\beta^2\ln^2x/\xhi) & \xhi\leq x<\xmax
+%    \end{cases}
+%\end{equation}
+%where $f(x)$ is tabulated within $[\xlo, \xhi]$, and is undefined but extrapolated outside
+%by power law from the end segments. The suppression $\alpha$ and $\beta$ default to 0.
+%\emph{The suppression feature is removed, only extrapolation is done.}
+$f(x)$ is padded either with power-law extrapolations from the end segments
+beyond the tabulated region, or with zeros.
+
+
+\paragraph{Gamma function}
+The reflection and duplication formulae are useful for playing with the gamma functions
+\begin{align}
+    \frac\pi{\sin\pi z} &= \Gamma(1-z)\Gamma(z) = (-1)^n\Gamma(1+n-z)\Gamma(z-n)  \\
+    \Gamma(z)\Gamma(z+\tfrac12) &= 2^{1-2z}\sqrt\pi\,\Gamma(2z)
+\end{align}
+
+
+\bibliographystyle{alpha}
+\bibliography{fit.bib}
+\end{document}

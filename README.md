@@ -1,2 +1,2 @@
 # fit
-Fast Integral Transforms
+Fast Integral Transforms using the FFTLog algorithm
