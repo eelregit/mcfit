@@ -50,6 +50,17 @@ class fit(object):
     G : float, array_like
         output function tabulated at y, internal paddings are discarded before output
 
+    Example
+    -------
+    >>> x = numpy.logspace(-3, 3, num=60, endpoint=False)
+    >>> F = 1 / (1 + x*x)**1.5
+    >>> H = fit(x, fit.kernels.Mellin_BesselJ(0), q=1)
+    >>> # more convenient to use the Hankel subclass from fit.tranforms
+    >>> H.check(F)
+    >>> y, G = H(F)
+    >>> Gexact = exp(-y)
+    >>> allclose(G, Gexact)
+
     References
     ----------
     .. [1] J. D. Talman. Numerical Fourier and Bessel Transforms in Logarithmic Variables.
