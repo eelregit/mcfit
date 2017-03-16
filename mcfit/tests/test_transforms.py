@@ -1,6 +1,6 @@
 from numpy import exp, logspace
 from numpy.testing import assert_allclose
-from mcfit.transforms import Hankel
+from ..transforms import *
 
 def test_Hankel():
     x = logspace(-3, 3, num=60, endpoint=False)
