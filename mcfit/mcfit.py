@@ -139,7 +139,7 @@ class mcfit(object):
 
 
     def check(self, F):
-        """sanity checks
+        """rough sanity checks on the input
         """
         f = self.prefac * self.x**(-self.q) * F
         fabs = abs(f)

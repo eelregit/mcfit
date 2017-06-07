@@ -1,5 +1,10 @@
 from numpy import exp, log, pi, sqrt
-from scipy.special import loggamma, gamma
+from scipy.special import gamma
+try:
+    from scipy.special import loggamma
+except ImportError:
+    def loggamma(x):
+        return log(gamma(x))
 
 def Mellin_BesselJ(nu):
     def UK(z):
