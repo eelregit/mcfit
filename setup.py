@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name = 'mcfit',
     version = '0.0.3',
-    author = 'Yin Li',
-    author_email = 'eelregit@gmail.com',
     description = 'Multiplicative convolutional fast integral transforms',
     url = 'https://github.com/eelregit/mcfit',
-    packages = ['mcfit', 'mcfit.tests'],
-    zip_safe = True,
+    author = 'Yin Li',
+    author_email = 'eelregit@gmail.com',
     license = 'GPLv3',
+    keywords = 'numerical integral transform FFTLog cosmology'
+    packages = ['mcfit', 'mcfit.tests'],
     install_requires = ['numpy', 'scipy'],
 )
