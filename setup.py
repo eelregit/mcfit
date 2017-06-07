@@ -9,7 +9,7 @@ setup(
     author = 'Yin Li',
     author_email = 'eelregit@gmail.com',
     license = 'GPLv3',
-    keywords = 'numerical integral transform FFTLog cosmology'
+    keywords = 'numerical integral transform FFTLog cosmology',
     packages = ['mcfit', 'mcfit.tests'],
     install_requires = ['numpy', 'scipy'],
 )
