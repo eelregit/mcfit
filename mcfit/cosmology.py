@@ -9,6 +9,9 @@ from . import kernels
 from numpy import pi, real_if_close
 
 
+__all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar', 'ExcursionSet']
+
+
 class P2xi(mcfit):
     """
     Power spectrum to correlation function

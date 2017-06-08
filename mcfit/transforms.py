@@ -10,6 +10,10 @@ from numpy import pi
 from scipy.special import gamma
 
 
+__all__ = ['Hankel', 'SphericalBessel', 'FourierSine', 'FourierCosine',
+           'TophatSmooth', 'GaussSmooth']
+
+
 class Hankel(mcfit):
     """
     Hankel transform pair
