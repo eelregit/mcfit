@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     name = 'mcfit',
     version = '0.0.3',
-    description = 'Multiplicative convolutional fast integral transforms',
+    description = 'Multiplicatively convolutional fast integral transforms',
     url = 'https://github.com/eelregit/mcfit',
     author = 'Yin Li',
     author_email = 'eelregit@gmail.com',

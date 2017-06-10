@@ -1,4 +1,4 @@
-mcfit: Multiplicative Convolutional Fast Integral Transforms
+mcfit: Multiplicatively Convolutional Fast Integral Transforms
 ============================================================
 
 `mcfit` computes integral transforms of the form

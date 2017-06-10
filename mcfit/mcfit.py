@@ -5,7 +5,7 @@ from numpy.fft import rfft, hfft
 
 
 class mcfit(object):
-    r"""Multiplicative Convolutional Fast Integral Transform
+    r"""Multiplicatively Convolutional Fast Integral Transform
 
     Compute integral transforms of the form
 
