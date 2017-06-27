@@ -9,7 +9,7 @@ from . import kernels
 from numpy import pi, real_if_close
 
 
-__all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar', 'ExcursionSet']
+__all__ = ['P2xi', 'xi2P', 'DoubleSphericalBessel', 'TophatVar', 'GaussVar', 'ExcursionSet']
 
 
 class P2xi(mcfit):
@@ -35,6 +35,21 @@ class xi2P(mcfit):
         prefac = r**3
         postfac = (2*pi)**1.5 / real_if_close(1j**l)
         mcfit.__init__(self, r, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+
+
+class DoubleSphericalBessel(mcfit):
+    r"""
+    .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
+                = \int_0^\infty F(x) j_{l_1}(xy_1) j_{l_2}(xy_2) \,x^2\d x
+    """
+    def __init__(self, x, alpha, l1=0, l2=0, q=1.5, N=None, lowring=True):
+        self.alpha = alpha
+        self.l1 = l1
+        self.l2 = l2
+        UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, l1, l2)
+        prefac = x**3
+        postfac = 1
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
 
 
 class TophatVar(mcfit):

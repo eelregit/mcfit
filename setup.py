@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name = 'mcfit',
-    version = '0.0.3',
+    version = '0.0.4',
     description = 'Multiplicatively convolutional fast integral transforms',
     url = 'https://github.com/eelregit/mcfit',
     author = 'Yin Li',
@@ -11,5 +11,5 @@ setup(
     license = 'GPLv3',
     keywords = 'numerical integral transform FFTLog cosmology',
     packages = ['mcfit', 'mcfit.tests'],
-    install_requires = ['numpy', 'scipy'],
+    install_requires = ['numpy', 'scipy', 'mpmath'],
 )

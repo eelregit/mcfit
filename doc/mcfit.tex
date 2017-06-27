@@ -10,15 +10,16 @@
 \newcommand{\xmax}{x_\textrm{max}}
 \newcommand{\ymin}{y_\textrm{min}}
 \newcommand{\ymax}{y_\textrm{max}}
-\newcommand{\Nhalf}{\lfloor N/2\rfloor} 
-\newcommand{\Tophat}{\textrm{T}} 
-\newcommand{\Gauss}{\textrm{G}} 
+\newcommand{\Nhalf}{\lfloor N/2\rfloor}
+\newcommand{\Mellin}{U}
+\newcommand{\Tophat}{\textrm{T}}
+\newcommand{\Gauss}{\textrm{G}}
 
 
 \begin{document}
 \title{\texttt{mcfit}: Multiplicatively Convolutional Fast Integral Transforms}
 \author{Yin Li}
-\date{Mar. 2017}
+\date{Jun. 2017}
 \maketitle
 
 
@@ -93,9 +94,9 @@ the Fourier transform of the kernel including the tilt factor,
 as a Mellin transform
 \begin{equation}
     \label{Mellin}
-    U_K(z) \equiv \int_0^\infty t^{z-1} K(t) \,\d t
+    \Mellin_K(z) \equiv \int_0^\infty t^{z-1} K(t) \,\d t
 \end{equation}
-which satisfies $U_K^*(z)=U_K(z^*)$, and derive
+which satisfies $\Mellin_K^*(z)=\Mellin_K(z^*)$, and derive
 \begin{align}
     g(y) &\approx \frac1N {\sum_m}' g_m \exp\Bigl[-\frac{i2\pi m\ln(y/\ymin)}{N\Delta}\Bigr]  \\
     \label{step6}
@@ -108,7 +109,7 @@ where
     g_m &= f_m u_m  \\
     \label{step4}
     u_m &= \exp\Bigl[-\frac{i2\pi m\ln(\xmin\ymax)}{N\Delta}\Bigr]
-    U_K\Bigl(q+i\frac{2\pi m}{N\Delta}\Bigr) \qquad -\Nhalf\leq m\leq\Nhalf
+    \Mellin_K\Bigl(q+i\frac{2\pi m}{N\Delta}\Bigr) \qquad -\Nhalf\leq m\leq\Nhalf
 \end{align}
 
 We should make $u_m$ periodic over $m\in\mathbb{Z}_N$, however
@@ -121,7 +122,7 @@ In practice we can impose
 which is automatically satisfied if
 \begin{equation}
     \label{step3lowring}
-    \ln(\xmin\ymax) = \frac\Delta\pi \mathrm{Arg} U_K\Bigl(q+i\frac\pi\Delta\Bigr)
+    \ln(\xmin\ymax) = \frac\Delta\pi \mathrm{Arg} \Mellin_K\Bigl(q+i\frac\pi\Delta\Bigr)
     + \textrm{integer} \cdot \Delta
 \end{equation}
 where the argument takes its principal value in $(-\pi,\pi]$
@@ -147,7 +148,7 @@ $u_m$ from Eq.~\eqref{step4} should be saved for multiple transformations.
     f(x) &\to x^{2-q}F(x)  \\
     g(y) &\to y^q G(y)  \\
     K(t) &\to J_\nu(t)  \\
-    U_K(z) &= 2^{z-1} \frac{\Gamma\bigl(\frac{\nu+z}2\bigr)}{\Gamma\bigl(\frac{2+\nu-z}2\bigr)}
+    \Mellin_K(z) &= 2^{z-1} \frac{\Gamma\bigl(\frac{\nu+z}2\bigr)}{\Gamma\bigl(\frac{2+\nu-z}2\bigr)}
 \end{align}
 The pair is symmetric when $q=1$.
 
@@ -160,7 +161,7 @@ The pair is symmetric when $q=1$.
     f(x) &\to x^{3-q} F(x)  \\
     g(y) &\to y^q G(y)  \\
     K(t) &\to \sqrt\frac2\pi j_\nu(t) = \frac{J_{\nu+\frac12}(t)}{\sqrt t}  \\
-    U_K(z) &= 2^{z-\frac32} \frac{\Gamma\bigl(\frac{\nu+z}2\bigr)}{\Gamma\bigl(\frac{3+\nu-z}2\bigr)}
+    \Mellin_K(z) &= 2^{z-\frac32} \frac{\Gamma\bigl(\frac{\nu+z}2\bigr)}{\Gamma\bigl(\frac{3+\nu-z}2\bigr)}
 \end{align}
 The pair is symmetric when $q=\frac32$.
 
@@ -173,7 +174,7 @@ The pair is symmetric when $q=\frac32$.
     f(x) &\to x^{1-q} F(x)  \\
     g(y) &\to y^q G(y)  \\
     K(t) &\to \sqrt\frac2\pi \sin(t) = \sqrt t J_\frac12(t)  \\
-    U_K(z) &= \sqrt\frac2\pi \Gamma(z) \sin\bigl(\frac{\pi z}2\bigr)
+    \Mellin_K(z) &= \sqrt\frac2\pi \Gamma(z) \sin\bigl(\frac{\pi z}2\bigr)
     = 2^{z-\frac12} \frac{\Gamma\bigl(\frac{1+z}2\bigr)}{\Gamma\bigl(\frac{2-z}2\bigr)}
 \end{align}
 The pair is symmetric when $q=\frac12$.
@@ -187,7 +188,7 @@ The pair is symmetric when $q=\frac12$.
     f(x) &\to x^{1-q} F(x)  \\
     g(y) &\to y^q G(y)  \\
     K(t) &\to \sqrt\frac2\pi \cos(t) = \sqrt t J_{-\frac12}(t)  \\
-    U_K(z) &= \sqrt\frac2\pi \Gamma(z) \cos\bigl(\frac{\pi z}2\bigr)
+    \Mellin_K(z) &= \sqrt\frac2\pi \Gamma(z) \cos\bigl(\frac{\pi z}2\bigr)
     = 2^{z-\frac12} \frac{\Gamma\bigl(\frac{z}2\bigr)}{\Gamma\bigl(\frac{1-z}2\bigr)}
 \end{align}
 The pair is symmetric when $q=\frac12$.
@@ -199,7 +200,7 @@ The pair is symmetric when $q=\frac12$.
 \subparagraph{Top-hat smoothing of a radial function}
 in $\mathbb{R}^d$
 \begin{equation}
-    F_W(R) = \int_0^\infty \frac{k^dF(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}
+    F_W(R) = \int_0^\infty \frac{k^d F(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}
                     W_\Tophat(kR) \,\frac{\d k}k
 \end{equation}
 where
@@ -216,7 +217,7 @@ where
     f(x) &\to \frac{k^{d-q}F(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}  \\
     g(y) &\to R^q F_W(R)  \\
     K(t) &\to W_\Tophat(t)  \\
-    U_K(z) &= 2^{z-1} \frac{\Gamma\bigl(\frac{2+d}2\bigr)\Gamma\bigl(\frac{z}2\bigr)}
+    \Mellin_K(z) &= 2^{z-1} \frac{\Gamma\bigl(\frac{2+d}2\bigr)\Gamma\bigl(\frac{z}2\bigr)}
                         {\Gamma\bigl(\frac{2+d-z}2\bigr)}
 \end{align}
 
@@ -224,7 +225,7 @@ where
 \subparagraph{Gaussian smoothing of a radial function}
 in $\mathbb{R}^d$
 \begin{equation}
-    F_W(R) = \int_0^\infty \frac{k^dF(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}
+    F_W(R) = \int_0^\infty \frac{k^d F(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}
                     W_\Gauss(kR) \,\frac{\d k}k
 \end{equation}
 where
@@ -238,7 +239,7 @@ where
     f(x) &\to \frac{k^{d-q}F(k)}{2^{d-1}\pi^\frac{d}2\Gamma\bigl(\frac{d}2\bigr)}  \\
     g(y) &\to R^q F_W(R)  \\
     K(t) &\to W_\Gauss(t)  \\
-    U_K(z) &= 2^{\frac{z}2-1} \Gamma\bigl(\tfrac{z}2\bigr)
+    \Mellin_K(z) &= 2^{\frac{z}2-1} \Gamma\bigl(\tfrac{z}2\bigr)
 \end{align}
 
 
@@ -273,6 +274,30 @@ with the rest the same as the spherical Bessel transform.
 The 2-pt function conversion pair is symmetric when $q=\frac32$.
 
 
+\subparagraph{Double Spherical Bessel integral}
+\begin{equation}
+    G(y_1, y_2) = \int_0^\infty F(x) j_{l_1}(xy_1) j_{l_2}(xy_2) \,x^2\d x
+\end{equation}
+\begin{align}
+    y &\to y_1  \\
+    f(x) &\to x^{3-q} F(x)  \\
+    \alpha &\equiv y_2/y_1  \\
+    g(y; \alpha) &\to y_1^q G(y_1, y_2)  \\
+    K(t;\alpha) &\to j_{l_1}(t) j_{l_2}(\alpha t)  \\
+    \Mellin_K(z;\alpha) &=
+    \begin{cases}
+        \frac{2^{z-3} \pi \alpha^{l_2} \Gamma\bigl(\frac{l_1+l_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{3+l_1-l_2-z}2\bigr) \Gamma\bigl(\frac32+l_2\bigr)}
+        \,_2F_1\bigl( \frac{-1-l_1+l_2+z}2, \frac{l_1+l_2+z}2, \frac32+l_2; \alpha^2 \bigr)
+        & \quad 0<\alpha\leq1  \\
+        \frac{2^{z-3} \pi \alpha^{-l_1-z} \Gamma\bigl(\frac{l_1+l_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{3-l_1+l_2-z}2\bigr) \Gamma\bigl(\frac32+l_1\bigr)}
+        \,_2F_1\bigl( \frac{-1+l_1-l_2+z}2, \frac{l_1+l_2+z}2, \frac32+l_1; \alpha^{-2} \bigr)
+        & \quad \alpha>1
+    \end{cases}
+\end{align}
+
+
 \subparagraph{Variance in a Top-hat window}
 in $\mathbb{R}^3$
 \begin{equation}
@@ -288,7 +313,7 @@ where
     f(x) &\to \frac{k^{3-q}P(k)}{2\pi^2}  \\
     g(y) &\to R^q \sigma_\Tophat^2(R)  \\
     K(t) &\to W_\Tophat^2(t)  \\
-    U_K(z) &= \frac{9\sqrt{\pi}(z-2)}{4(z-6)}
+    \Mellin_K(z) &= \frac{9\sqrt{\pi}(z-2)}{4(z-6)}
         \frac{\Gamma\bigl(\frac{z-4}2\bigr)}{\Gamma\bigl(\frac{5-z}2\bigr)}
 \end{align}
 
@@ -308,7 +333,7 @@ where
     f(x) &\to \frac{k^{3-q}P(k)}{2\pi^2}  \\
     g(y) &\to R^q \sigma_\Gauss^2(R)  \\
     K(t) &\to W_\Gauss^2(t)  \\
-    U_K(z) &= \frac12 \Gamma\bigl(\frac{z}2\bigr)
+    \Mellin_K(z) &= \frac12 \Gamma\bigl(\frac{z}2\bigr)
 \end{align}
 
 
@@ -324,7 +349,7 @@ same as top-hat smoothing of a radial function given previously.
     f(x) &\to \frac{k^{3-q}\delta(k)}{2\pi^2}  \\
     g(y) &\to R^q \delta^W(R)  \\
     K(t) &\to W_\Tophat(t)  \\
-    U_K(z) &= 3\sqrt\pi 2^{z-3}
+    \Mellin_K(z) &= 3\sqrt\pi 2^{z-3}
             \frac{\Gamma\bigl(\frac{z}2\bigr)}{\Gamma\bigl(\frac{5-z}2\bigr)}
 \end{align}
 Note that $\delta(k)$ is random and not smooth.
