@@ -55,8 +55,12 @@ class DoubleSphericalBessel(mcfit):
     """
     def __init__(self, x, alpha, l=0, l1=None, l2=None, q=1.5, N=None, lowring=True):
         self.alpha = alpha
-        self.l1 = l1 if l1 is not None else l
-        self.l2 = l2 if l2 is not None else l
+        if l1 is None:
+            l1 = l
+        if l2 is None:
+            l2 = l
+        self.l1 = l1
+        self.l2 = l2
         UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, l1, l2)
         prefac = x**3
         postfac = 1
