@@ -26,21 +26,18 @@
 This package computes integral transforms with product kernels
 using the FFTLog algorithm \cite{Talman78,Hamilton00}
 \begin{equation}
-    G(y) = \int_0^\infty F(x) K(xy) \,\frac{\d x}x
-\end{equation}
-or equivalently
-\begin{equation}
     \label{IT}
     g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\d x}x
 \end{equation}
 where $K(xy)$ is the kernel function and $q$ is a power-law tilt parameter.
 And with $f(x)\propto x^{-q}$, $g(y)\propto y^q$, one is free to choose $q$.
-We can tilt $f(x)$ to balance $f$ at large and small $x$,
-in order to improve accuracy and reduce ringing.
+We can tilt $f(x)$ either to balance $f$ at large and small $x$ to reduce
+ringing, or to shift focus onto the most relevant range to improve accuracy.
 
 The idea is to take advantage of the convolution theorem in $\ln x$ and $\ln y$.
-We approximate $f(x)$ with truncated Fourier series,
-and use the exact Fourier transform of the possibly oscillatory kernel.
+We approximate $f(x)$ with truncated Fourier series over one period of a
+periodic approximant, and use the exact Fourier transform of the possibly
+oscillatory kernel.
 We can calculate the latter analytically via Mellin transform.
 This algorithm performs the best if $f$ can be accurately approximated
 by a sum of finite Fourier modes and logarithmically uniform discretization,
@@ -372,15 +369,18 @@ We test our implementation on Hankel transform in the following analytic case
 
 
 \subparagraph{Length: $N$}
+determines the period of the periodic approximant, and large $N$ suppresses
+the aliasing contribution from the images.
 Odd $N$ has worse ringing problem, similar to the case without low-ringing condition.
 
 
 \subparagraph{Tilt: $q$}
-We can reduce ringing by balancing the large and small scale amplitudes with the tilt.
-The gamma function has simple poles at the non-positive integers,
-which can be avoided by picking $q$.
-However, one should not use a tilt too large, as it tends to shift the focus away
-and thus reduces the accuracy on the interested scales.
+can be useful in 2 ways.
+We can use it either to balance $f$ at large and small $x$ in order to reduce
+ringing or to cancel a divergence, or to improve accuracy by shifting the focus
+onto the most relevant range for a better Fourier expansion.
+The gamma function has simple poles at the non-positive integers, which cause
+numerical problems that can be avoided by picking a $q$ far away from them.
 
 
 \subparagraph{Padding:}

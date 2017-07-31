@@ -9,7 +9,6 @@ class mcfit(object):
 
     Compute integral transforms of the form
 
-    .. math:: G(y) = \int_0^\infty F(x) K(xy) \,\frac{\mathrm{d}x}x
     .. math:: g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\mathrm{d}x}x
 
     using the FFTLog [1]_[2]_ algorithm.
