@@ -6,7 +6,7 @@ mcfit: Multiplicatively Convolutional Fast Integral Transforms
 .. math:: g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\mathrm{d}x}x
 
 where :math:`K(xy)` is the integral kernel as a function of the product of the
-input and output arguments, and $q$ is a power-law tilt parameter.
+input and output arguments, and :math:`q` is a power-law tilt parameter.
 
 `mcfit` implements the FFTLog algorithm.
 The idea is to take advantage of the convolution theorem
