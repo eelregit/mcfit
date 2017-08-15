@@ -75,7 +75,8 @@ class TophatVar(mcfit):
     --------
     To compute σ₈ for a linear power spectrum :math:`P(k)`
     >>> R, sigma = TophatVar(k)(P)
-    >>> sigmaR = scipy.interpolate.CubicSpline(R, sigma)
+    >>> from scipy.interpolate import CubicSpline
+    >>> sigmaR = CubicSpline(R, sigma)
     >>> sigma8 = sigmaR(8)
     """
     def __init__(self, k, q=1.5, N=None, lowring=True):
