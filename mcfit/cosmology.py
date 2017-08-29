@@ -13,8 +13,7 @@ __all__ = ['P2xi', 'xi2P', 'DoubleSphericalBessel', 'TophatVar', 'GaussVar', 'Ex
 
 
 class P2xi(mcfit):
-    """
-    Power spectrum to correlation function
+    """Power spectrum to correlation function
     """
     def __init__(self, k, l=0, q=1.5, N=None, lowring=True):
         self.l = l
@@ -25,9 +24,8 @@ class P2xi(mcfit):
 
 
 class xi2P(mcfit):
-    """
-    Correlation function to power spectrum
-    Also radial profile to its Fourier transform
+    """Correlation function to power spectrum,
+    also radial profile to its Fourier transform
     """
     def __init__(self, r, l=0, q=1.5, N=None, lowring=True):
         self.l = l
@@ -38,7 +36,7 @@ class xi2P(mcfit):
 
 
 class DoubleSphericalBessel(mcfit):
-    r"""
+    r"""Compute integrals with two spherical Bessel functions
     .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
                 = \int_0^\infty F(x) j_{l_1}(xy_1) j_{l_2}(xy_2) \,x^2\d x
 
@@ -47,11 +45,11 @@ class DoubleSphericalBessel(mcfit):
     alpha : float
         y2 / y1
     l : int, optional
-        default to 0
+        default is 0
     l1 : int, optional
-        default to l
+        default is l
     l2 : int, optional
-        default to l
+        default is l
     """
     def __init__(self, x, alpha, l=0, l1=None, l2=None, q=1.5, N=None, lowring=True):
         self.alpha = alpha
@@ -68,12 +66,12 @@ class DoubleSphericalBessel(mcfit):
 
 
 class TophatVar(mcfit):
-    """
-    Variance in a top-hat window
+    """Variance in a top-hat window
 
     Examples
     --------
-    To compute σ₈ for a linear power spectrum :math:`P(k)`
+    To compute σ₈ of a linear power spectrum :math:`P(k)`, with k in unit of
+    :math:`h/\mathrm{Mpc}` and P in unit of :math:`\mathrm{Mpc}^3/h^3`
     >>> R, sigma = TophatVar(k)(P)
     >>> from scipy.interpolate import CubicSpline
     >>> sigmaR = CubicSpline(R, sigma)
@@ -87,8 +85,7 @@ class TophatVar(mcfit):
 
 
 class GaussVar(mcfit):
-    """
-    Variance in a Gaussian window
+    """Variance in a Gaussian window
     """
     def __init__(self, k, q=1.5, N=None, lowring=True):
         UK = kernels.Mellin_GaussSq()
@@ -98,8 +95,7 @@ class GaussVar(mcfit):
 
 
 class ExcursionSet(mcfit):
-    """
-    Excursion set trajectory
+    """Excursion set trajectory
     BCEK 91 model
     """
     def __init__(self, k, q=0, N=None, lowring=True):
