@@ -72,10 +72,10 @@ class TophatVar(mcfit):
     --------
     To compute σ₈ of a linear power spectrum :math:`P(k)`, with k in unit of
     :math:`h/\mathrm{Mpc}` and P in unit of :math:`\mathrm{Mpc}^3/h^3`
-    >>> R, sigma = TophatVar(k)(P)
+    >>> R, var = TophatVar(k)(P)
     >>> from scipy.interpolate import CubicSpline
-    >>> sigmaR = CubicSpline(R, sigma)
-    >>> sigma8 = sigmaR(8)
+    >>> varR = CubicSpline(R, var)
+    >>> sigma8 = numpy.sqrt(varR(8))
     """
     def __init__(self, k, q=1.5, N=None, lowring=True):
         UK = kernels.Mellin_TophatSq(3)
