@@ -2,11 +2,15 @@ mcfit: Multiplicatively Convolutional Fast Integral Transforms
 ==============================================================
 
 `mcfit` computes integral transforms of the form
+
 .. math:: G(y) = \int_0^\infty F(x) K(xy) \,\frac{\mathrm{d}x}x
+
 where :math:`F(x)` is the input function, :math:`G(y)` is the output function,
 and :math:`K(xy)` is the integral kernel.
 Equivalently
+
 .. math:: g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\mathrm{d}x}x
+
 where :math:`f(x)=x^{-q}F(x)`, :math:`g(y)=y^q G(y)`, and the tilt :math:`q` is
 a free parameter serving to shift power of :math:`x` between the input function
 :math:`F(x)` and the kernel.
