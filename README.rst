@@ -13,13 +13,13 @@ Equivalently
 
 where :math:`f(x)=x^{-q}F(x)`, :math:`g(y)=y^q G(y)`, and the tilt :math:`q` is
 a free parameter serving to shift power of :math:`x` between the input function
-:math:`F(x)` and the kernel.
+and the kernel.
 
 `mcfit` implements the FFTLog algorithm.
 The idea is to take advantage of the convolution theorem in :math:`\ln x` and
 :math:`\ln y`.
 It approximate the input function with truncated Fourier series, and use the
 exact Fourier transform of the (possibly oscillatory) kernel.
-One can calculate the latter analytically via Mellin transform.
+One can calculate the latter analytically as a Mellin transform.
 This algorithm is optimal when the input function is smooth and spans a large
 range in :math:`\ln x`.
