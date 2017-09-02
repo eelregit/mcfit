@@ -60,8 +60,8 @@ class mcfit(object):
     >>> x = numpy.logspace(-3, 3, num=60, endpoint=False)
     >>> F = 1 / (1 + x*x)**1.5
     >>> H = mcfit(x, mcfit.kernels.Mellin_BesselJ(0))
-    >>> H.check(F)
-    >>> y, G = H(F)
+    >>> H.check(x**2 * F)
+    >>> y, G = H(x**2 * F)
     >>> Gexact = numpy.exp(-y)
     >>> numpy.allclose(G, Gexact)
 
