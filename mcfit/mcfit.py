@@ -22,7 +22,7 @@ class mcfit(object):
     Parameters
     ----------
     x : float, array_like
-        log-evenly spaced argument of F
+        log-evenly spaced input argument
     UK : callable
         Mellin transform of the kernel
         .. math:: U_K(z) \equiv \int_0^\infty t^z K(t) \, \mathrm{d}t
@@ -36,14 +36,19 @@ class mcfit(object):
         if True and N is even, set y according to the low-ringing condition,
         otherwise
         :math:`x_\mathrm{min}*y_\mathrm{max}=x_\mathrm{max}*y_\mathrm{min}=1`
+
+    Attributes
+    ----------
+    x : float, array_like
+        log-evenly spaced input argument
+    y : float, array_like
+        log-evenly spaced output argument
     prefac : float, array_like
-        multiply the input function by prefac before the transform, serving to
-        convert an integral to the general form (apart from the tilt factor
-        :math:`x^{-q}`)
+        factor to multiply before the transform, serves to convert an integral
+        to the general form (apart from the tilt factor :math:`x^{-q}`)
     postfac : float, array_like
-        multiply the output function by postfac after the transform, serving to
-        convert an integral to the general form (apart from the tilt factor
-        :math:`y^{-q}`)
+        factor to multiply after the transform, serves to convert an integral
+        to the general form (apart from the tilt factor :math:`y^{-q}`)
 
     Methods
     -------
@@ -79,19 +84,26 @@ class mcfit(object):
         self.x = x
         self.UK = UK
         self.q = q
-        self._setup(N)
         self.lowring = lowring
+        self._setup(N)
         self.prefac = prefac
         self.postfac = postfac
+        if prefac != 1 or postfac != 1:
+            import warnings
+            msg = "prefac and postfac as parameters will be deprecated. " \
+            "Use them as attributes instead. See cosmology.xi2P.__init__ " \
+            "for an example. This gives the flexibility that postfac can " \
+            "be made a function of the output argument."
+            warnings.warn(msg, FutureWarning)
 
 
     def _setup(self, N):
-        """Internal function to validate x, to set N and y, and to compute
+        """Internal function to validate x, set N and y, and compute
         coefficients :math:`u_m`
         """
         Nx = len(self.x)
         if Nx < 2:
-            raise ValueError("length of argument is too short")
+            raise ValueError("length of input argument is too short")
         Delta = log(self.x[-1] / self.x[0]) / (Nx - 1)
         if not allclose(self.x[1:] / self.x[:-1], exp(Delta), rtol=1e-3):
             raise ValueError("input argument must be log-evenly spaced")
@@ -102,8 +114,7 @@ class mcfit(object):
         else:
             self.N = N
         if self.N < Nx:
-            raise ValueError("N is shorter than the length of argument")
-        self._Npad = self.N - Nx
+            raise ValueError("N is shorter than the length of input argument")
 
         lnxy = 0 # = lnxmin + lnymax = lnxmax + lnymin
         if self.lowring and self.N % 2 == 0:
@@ -136,7 +147,7 @@ class mcfit(object):
         Returns
         -------
         y : float, array_like
-            log-evenly spaced argument of G
+            log-evenly spaced output argument
         G : float, array_like
             output function, with internal paddings discarded
         """
@@ -150,17 +161,18 @@ class mcfit(object):
             extrap_l = extrap_r = extrap
         elif isinstance(extrap, (tuple, list)) and len(extrap) == 2 and \
                 all(isinstance(e, bool) for e in extrap):
-            extrap_l, extrap_r = *extrap
+            extrap_l, extrap_r = extrap
         else:
             raise TypeError("extrap must be either a bool or a tuple of two bools")
+        Npad = self.N - len(self.x)
         if extrap_l:
-            fpad_l = f[0] * (f[1] / f[0]) ** arange(-(self._Npad//2), 0)
+            fpad_l = f[0] * (f[1] / f[0]) ** arange(-(Npad//2), 0)
         else:
-            fpad_l = zeros(self._Npad//2)
+            fpad_l = zeros(Npad//2)
         if extrap_r:
-            fpad_r = f[-1] * (f[-1] / f[-2]) ** arange(1, self._Npad - self._Npad//2 + 1)
+            fpad_r = f[-1] * (f[-1] / f[-2]) ** arange(1, Npad - Npad//2 + 1)
         else:
-            fpad_r = zeros(self._Npad - self._Npad//2)
+            fpad_r = zeros(Npad - Npad//2)
         f = concatenate((fpad_l, f, fpad_r))
 
         # convolution
@@ -169,7 +181,7 @@ class mcfit(object):
         g = hfft(g, self.N) / self.N # g_m -> g(y_n)
 
         # discard paddings
-        g = g[self._Npad - self._Npad//2 : self.N - self._Npad//2]
+        g = g[Npad - Npad//2 : self.N - Npad//2]
 
         G = self.postfac * self.y**(-self.q) * g
 
@@ -201,9 +213,9 @@ class mcfit(object):
             print("right tail may blow up: {:.2g} vs {:.2g}, "
                     "change tilt or avoid extrapolation".format(f[-2], f[-1]))
 
-        if f[0]*f[1] < 0:
+        if f[0]*f[1] <= 0:
             print("left tail looks wiggly: {:.2g} vs {:.2g}, "
                     "avoid extrapolation".format(f[0], f[1]))
-        if f[-2]*f[-1] < 0:
+        if f[-2]*f[-1] <= 0:
             print("right tail looks wiggly: {:.2g} vs {:.2g}, "
                     "avoid extrapolation".format(f[-2], f[-1]))

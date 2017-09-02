@@ -20,9 +20,8 @@ class Hankel(mcfit):
     def __init__(self, x, nu=0, q=1, N=None, lowring=True):
         self.nu = nu
         UK = kernels.Mellin_BesselJ(nu)
-        prefac = x**2
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**2
 
 
 class SphericalBessel(mcfit):
@@ -31,9 +30,8 @@ class SphericalBessel(mcfit):
     def __init__(self, x, nu=0, q=1.5, N=None, lowring=True):
         self.nu = nu
         UK = kernels.Mellin_SphericalBesselJ(nu)
-        prefac = x**3
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**3
 
 
 class FourierSine(mcfit):
@@ -41,9 +39,8 @@ class FourierSine(mcfit):
     """
     def __init__(self, x, q=0.5, N=None, lowring=True):
         UK = kernels.Mellin_FourierSine()
-        prefac = x
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x
 
 
 class FourierCosine(mcfit):
@@ -51,9 +48,8 @@ class FourierCosine(mcfit):
     """
     def __init__(self, x, q=0.5, N=None, lowring=True):
         UK = kernels.Mellin_FourierCosine()
-        prefac = x
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x
 
 
 class TophatSmooth(mcfit):
@@ -62,9 +58,8 @@ class TophatSmooth(mcfit):
     def __init__(self, x, d=3, q=0, N=None, lowring=True):
         self.d = d
         UK = kernels.Mellin_Tophat(d)
-        prefac = x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
 
 
 class GaussSmooth(mcfit):
@@ -73,6 +68,5 @@ class GaussSmooth(mcfit):
     def __init__(self, x, d=3, q=0, N=None, lowring=True):
         self.d = d
         UK = kernels.Mellin_Gauss()
-        prefac = x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))

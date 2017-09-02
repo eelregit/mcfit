@@ -18,9 +18,8 @@ class P2xi(mcfit):
     def __init__(self, k, l=0, q=1.5, N=None, lowring=True):
         self.l = l
         UK = kernels.Mellin_SphericalBesselJ(l)
-        prefac = real_if_close(1j**l) * k**3 / (2*pi)**1.5
-        postfac = 1
-        mcfit.__init__(self, k, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, k, UK, q, N=N, lowring=lowring)
+        self.prefac *= real_if_close(1j**l) / (2*pi)**1.5 * self.x**3
 
 
 class xi2P(mcfit):
@@ -30,9 +29,9 @@ class xi2P(mcfit):
     def __init__(self, r, l=0, q=1.5, N=None, lowring=True):
         self.l = l
         UK = kernels.Mellin_SphericalBesselJ(l)
-        prefac = r**3
-        postfac = (2*pi)**1.5 / real_if_close(1j**l)
-        mcfit.__init__(self, r, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, r, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**3
+        self.postfac *= (2*pi)**1.5 / real_if_close(1j**l)
 
 
 class DoubleSphericalBessel(mcfit):
@@ -60,9 +59,8 @@ class DoubleSphericalBessel(mcfit):
         self.l1 = l1
         self.l2 = l2
         UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, l1, l2)
-        prefac = x**3
-        postfac = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**3
 
 
 class TophatVar(mcfit):
@@ -79,9 +77,8 @@ class TophatVar(mcfit):
     """
     def __init__(self, k, q=1.5, N=None, lowring=True):
         UK = kernels.Mellin_TophatSq(3)
-        prefac = k**3 / (2 * pi**2)
-        postfac = 1
-        mcfit.__init__(self, k, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, k, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**3 / (2 * pi**2)
 
 
 class GaussVar(mcfit):
@@ -89,9 +86,8 @@ class GaussVar(mcfit):
     """
     def __init__(self, k, q=1.5, N=None, lowring=True):
         UK = kernels.Mellin_GaussSq()
-        prefac = k**3 / (2 * pi**2)
-        postfac = 1
-        mcfit.__init__(self, k, UK, q, N=N, lowring=lowring, prefac=prefac, postfac=postfac)
+        mcfit.__init__(self, k, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**3 / (2 * pi**2)
 
 
 class ExcursionSet(mcfit):
