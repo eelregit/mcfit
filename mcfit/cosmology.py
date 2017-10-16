@@ -64,12 +64,12 @@ class DoubleSphericalBessel(mcfit):
 
 
 class TophatVar(mcfit):
-    """Variance in a top-hat window
+    r"""Variance in a top-hat window
 
     Examples
     --------
-    To compute sigma8 of a linear power spectrum :math:`P(k)`, with k in unit
-    of :math:`h/\mathrm{Mpc}` and P in unit of :math:`\mathrm{Mpc}^3/h^3`
+    To compute :math:`\sigma_8` of a linear power spectrum :math:`P(k)`, with
+    k in unit of :math:`h/\mathrm{Mpc}` and P in unit of :math:`\mathrm{Mpc}^3/h^3`
     >>> R, var = TophatVar(k)(P)
     >>> from scipy.interpolate import CubicSpline
     >>> varR = CubicSpline(R, var)
