@@ -1,6 +1,5 @@
 from __future__ import print_function, division
-from numpy import pi, abs, ceil, exp, log, log2, angle, \
-                array, arange, zeros, concatenate, searchsorted, allclose
+import numpy
 from numpy.fft import rfft, hfft
 
 
@@ -8,16 +7,19 @@ class mcfit(object):
     r"""Multiplicatively Convolutional Fast Integral Transform
 
     Compute integral transforms of the form
+
     .. math:: G(y) = \int_0^\infty F(x) K(xy) \,\frac{\mathrm{d}x}x
+
     using the FFTLog [1]_[2]_ algorithm.
     Here :math:`F(x)` is the input function, :math:`G(y)` is the output
     function, and :math:`K(xy)` is the integral kernel.
+    One is free to scale all three functions by a power law
 
-    Equivalently
-    .. math:: g(y) = \int_0^\infty f(x) (xy)^q K(xy) \,\frac{\mathrm{d}x}x
-    where :math:`f(x)=x^{-q}F(x)`, :math:`g(y)=y^q G(y)`, and the tilt
-    :math:`q` is a free parameter serving to shift power of :math:`x` between
-    the input function :math:`F(x)` and the kernel.
+    .. math:: g(y) = \int_0^\infty f(x) k(xy) \,\frac{\mathrm{d}x}x
+
+    where :math:`f(x)=x^{-q}F(x)`, :math:`g(y)=y^q G(y)`, and :math:`k(t)=t^q K(t)`.
+    And :math:`q` is a tilt parameter serving to shift power of :math:`x`
+    between the input function and the kernel.
 
     Parameters
     ----------
@@ -104,12 +106,12 @@ class mcfit(object):
         Nx = len(self.x)
         if Nx < 2:
             raise ValueError("length of input argument is too short")
-        Delta = log(self.x[-1] / self.x[0]) / (Nx - 1)
-        if not allclose(self.x[1:] / self.x[:-1], exp(Delta), rtol=1e-3):
+        Delta = numpy.log(self.x[-1] / self.x[0]) / (Nx - 1)
+        if not numpy.allclose(self.x[1:] / self.x[:-1], numpy.exp(Delta), rtol=1e-3):
             raise ValueError("input argument must be log-evenly spaced")
 
         if N is None:
-            folds = int(ceil(log2(Nx))) + 1
+            folds = int(numpy.ceil(numpy.log2(Nx))) + 1
             self.N = 2**folds
         else:
             self.N = N
@@ -118,12 +120,12 @@ class mcfit(object):
 
         lnxy = 0 # = lnxmin + lnymax = lnxmax + lnymin
         if self.lowring and self.N % 2 == 0:
-            lnxy = Delta / pi * angle(self.UK(self.q + 1j * pi / Delta))
-        self.y = exp(lnxy - Delta) / self.x[::-1]
+            lnxy = Delta / numpy.pi * numpy.angle(self.UK(self.q + 1j * numpy.pi / Delta))
+        self.y = numpy.exp(lnxy - Delta) / self.x[::-1]
 
-        m = arange(0, self.N//2 + 1)
-        self._u = self.UK(self.q + 2j * pi / self.N / Delta * m)
-        self._u *= exp(-2j * pi * lnxy / self.N / Delta * m)
+        m = numpy.arange(0, self.N//2 + 1)
+        self._u = self.UK(self.q + 2j * numpy.pi / self.N / Delta * m)
+        self._u *= numpy.exp(-2j * numpy.pi * lnxy / self.N / Delta * m)
 
         # following is unnecessary, for hfft ignores the imag at Nyquist anyway
         # if not self.lowring and self.N % 2 == 0:
@@ -159,21 +161,21 @@ class mcfit(object):
         # pad with power-law extrapolations or zeros
         if isinstance(extrap, bool):
             extrap_l = extrap_r = extrap
-        elif isinstance(extrap, (tuple, list)) and len(extrap) == 2 and \
+        elif isinstance(extrap, tuple) and len(extrap) == 2 and \
                 all(isinstance(e, bool) for e in extrap):
             extrap_l, extrap_r = extrap
         else:
             raise TypeError("extrap must be either a bool or a tuple of two bools")
         Npad = self.N - len(self.x)
         if extrap_l:
-            fpad_l = f[0] * (f[1] / f[0]) ** arange(-(Npad//2), 0)
+            fpad_l = f[0] * (f[1] / f[0]) ** numpy.arange(-(Npad//2), 0)
         else:
-            fpad_l = zeros(Npad//2)
+            fpad_l = numpy.zeros(Npad//2)
         if extrap_r:
-            fpad_r = f[-1] * (f[-1] / f[-2]) ** arange(1, Npad - Npad//2 + 1)
+            fpad_r = f[-1] * (f[-1] / f[-2]) ** numpy.arange(1, Npad - Npad//2 + 1)
         else:
-            fpad_r = zeros(Npad - Npad//2)
-        f = concatenate((fpad_l, f, fpad_r))
+            fpad_r = numpy.zeros(Npad - Npad//2)
+        f = numpy.concatenate((fpad_l, f, fpad_r))
 
         # convolution
         f = rfft(f) # f(x_n) -> f_m
@@ -192,9 +194,9 @@ class mcfit(object):
         """rough sanity checks on the input function
         """
         f = self.prefac * self.x**(-self.q) * F
-        fabs = abs(f)
+        fabs = numpy.abs(f)
 
-        iQ1, iQ3 = searchsorted(fabs.cumsum(), array([0.25, 0.75]) * fabs.sum())
+        iQ1, iQ3 = numpy.searchsorted(fabs.cumsum(), numpy.array([0.25, 0.75]) * fabs.sum())
         assert 0 != iQ1 != iQ3 != len(self.x), "checker giving up"
         fabs_l = fabs[:iQ1].mean()
         fabs_m = fabs[iQ1:iQ3].mean()
