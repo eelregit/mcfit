@@ -1,4 +1,4 @@
-from numpy import exp, log, pi, sqrt, frompyfunc
+from numpy import exp, log, pi, sqrt
 from scipy.special import gamma
 try:
     from scipy.special import loggamma
@@ -28,6 +28,7 @@ def Mellin_FourierCosine():
 
 def Mellin_DoubleSphericalBesselJ(alpha, l1, l2):
     import mpmath
+    from numpy import frompyfunc
     hyp2f1 = frompyfunc(lambda *a: complex(mpmath.hyp2f1(*a)), 4, 1)
     if 0 < alpha <= 1:
         def UK(z):

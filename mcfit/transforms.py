@@ -4,9 +4,10 @@ Common Integral transforms and applications
 ===========================================
 """
 
+from __future__ import division
 from .mcfit import mcfit
 from . import kernels
-from numpy import pi
+import numpy
 from scipy.special import gamma
 
 
@@ -59,7 +60,7 @@ class TophatSmooth(mcfit):
         self.d = d
         UK = kernels.Mellin_Tophat(d)
         mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
-        self.prefac *= self.x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
+        self.prefac *= self.x**d / (2**(d-1) * numpy.pi**(d/2) * gamma(d/2))
 
 
 class GaussSmooth(mcfit):
@@ -69,4 +70,4 @@ class GaussSmooth(mcfit):
         self.d = d
         UK = kernels.Mellin_Gauss()
         mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
-        self.prefac *= self.x**d / (2**(d-1) * pi**(d/2) * gamma(d/2))
+        self.prefac *= self.x**d / (2**(d-1) * numpy.pi**(d/2) * gamma(d/2))
