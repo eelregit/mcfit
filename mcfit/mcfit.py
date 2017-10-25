@@ -82,17 +82,17 @@ class mcfit(object):
             MNRAS, 312:257-284, February 2000.
     """
 
-    def __init__(self, x, UK, q, N=None, lowring=True, prefac=1, postfac=1):
-        self.x = x
+    def __init__(self, x, UK, q, N=None, lowring=True, prefac=None, postfac=None):
+        self.x = numpy.array(x)
         self.UK = UK
         self.q = q
         self.lowring = lowring
         self._setup(N)
-        self.prefac = prefac
-        self.postfac = postfac
-        if prefac != 1 or postfac != 1:
+        self.prefac = 1 if prefac is None else prefac
+        self.postfac = 1 if postfac is None else postfac
+        if prefac is not None or postfac is not None:
             import warnings
-            msg = "prefac and postfac as parameters will be deprecated. " \
+            msg = "prefac and postfac as parameters are deprecated. " \
             "Use them as attributes instead. See cosmology.xi2P.__init__ " \
             "for an example. This gives the flexibility that postfac can " \
             "be made a function of the output argument."
