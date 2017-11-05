@@ -1,6 +1,5 @@
 from __future__ import print_function, division
 import numpy
-from numpy.fft import rfft, hfft
 
 
 class mcfit(object):
@@ -178,9 +177,9 @@ class mcfit(object):
         f = numpy.concatenate((fpad_l, f, fpad_r))
 
         # convolution
-        f = rfft(f) # f(x_n) -> f_m
+        f = numpy.fft.rfft(f) # f(x_n) -> f_m
         g = f * self._u # f_m -> g_m
-        g = hfft(g, self.N) / self.N # g_m -> g(y_n)
+        g = numpy.fft.hfft(g, self.N) / self.N # g_m -> g(y_n)
 
         # discard paddings
         g = g[Npad - Npad//2 : self.N - Npad//2]
