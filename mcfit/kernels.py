@@ -26,20 +26,48 @@ def Mellin_FourierCosine():
         return exp(log(2)*(z-0.5) + loggamma(0.5*z) - loggamma(0.5*(1-z)))
     return UK
 
-def Mellin_DoubleSphericalBesselJ(alpha, l1, l2):
+def Mellin_DoubleBesselJ(alpha, nu1, nu2):
     import mpmath
     from numpy import frompyfunc
     hyp2f1 = frompyfunc(lambda *a: complex(mpmath.hyp2f1(*a)), 4, 1)
-    if 0 < alpha <= 1:
+    if 0 < alpha < 1:
         def UK(z):
-            return pi * exp(log(2)*(z-3) + log(alpha)*l2 + loggamma(0.5*(l1+l2+z))
-                            - loggamma(0.5*(3+l1-l2-z)) - loggamma(1.5+l2)) \
-                    * hyp2f1(0.5*(-1-l1+l2+z), 0.5*(l1+l2+z), 1.5+l2, alpha**2)
+            return exp(log(2)*(z-1) + log(alpha)*nu2 + loggamma(0.5*(nu1+nu2+z))
+                            - loggamma(0.5*(2+nu1-nu2-z)) - loggamma(1+nu2)) \
+                    * hyp2f1(0.5*(-nu1+nu2+z), 0.5*(nu1+nu2+z), 1+nu2, alpha**2)
     elif alpha > 1:
         def UK(z):
-            return pi * exp(log(2)*(z-3) + log(alpha)*(-l1-z) + loggamma(0.5*(l1+l2+z))
-                            - loggamma(0.5*(3-l1+l2-z)) - loggamma(1.5+l1)) \
-                    * hyp2f1(0.5*(-1+l1-l2+z), 0.5*(l1+l2+z), 1.5+l1, alpha**-2)
+            return exp(log(2)*(z-1) + log(alpha)*(-nu1-z) + loggamma(0.5*(nu1+nu2+z))
+                            - loggamma(0.5*(2-nu1+nu2-z)) - loggamma(1+nu1)) \
+                    * hyp2f1(0.5*(nu1-nu2+z), 0.5*(nu1+nu2+z), 1+nu1, alpha**-2)
+    elif alpha == 1:
+        def UK(z):
+            return exp(log(2)*(z-1) + loggamma(1-z) + loggamma(0.5*(nu1+nu2+z))
+                            - loggamma(0.5*(2+nu1-nu2-z))- loggamma(0.5*(2-nu1+nu2-z))
+                            - loggamma(0.5*(2+nu1+nu2-z)))
+    else:
+        raise ValueError
+    return UK
+
+def Mellin_DoubleSphericalBesselJ(alpha, nu1, nu2):
+    import mpmath
+    from numpy import frompyfunc
+    hyp2f1 = frompyfunc(lambda *a: complex(mpmath.hyp2f1(*a)), 4, 1)
+    if 0 < alpha < 1:
+        def UK(z):
+            return pi * exp(log(2)*(z-3) + log(alpha)*nu2 + loggamma(0.5*(nu1+nu2+z))
+                            - loggamma(0.5*(3+nu1-nu2-z)) - loggamma(1.5+nu2)) \
+                    * hyp2f1(0.5*(-1-nu1+nu2+z), 0.5*(nu1+nu2+z), 1.5+nu2, alpha**2)
+    elif alpha > 1:
+        def UK(z):
+            return pi * exp(log(2)*(z-3) + log(alpha)*(-nu1-z) + loggamma(0.5*(nu1+nu2+z))
+                            - loggamma(0.5*(3-nu1+nu2-z)) - loggamma(1.5+nu1)) \
+                    * hyp2f1(0.5*(-1+nu1-nu2+z), 0.5*(nu1+nu2+z), 1.5+nu1, alpha**-2)
+    elif alpha == 1:
+        def UK(z):
+            return pi * exp(log(2)*(z-3) + loggamma(2-z) + loggamma(0.5*(nu1+nu2+z))
+                            - loggamma(0.5*(3+nu1-nu2-z))- loggamma(0.5*(3-nu1+nu2-z))
+                            - loggamma(0.5*(4+nu1+nu2-z)))
     else:
         raise ValueError
     return UK

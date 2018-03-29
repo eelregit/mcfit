@@ -34,33 +34,7 @@ class xi2P(mcfit):
         self.postfac *= (2*numpy.pi)**1.5 / numpy.real_if_close(1j**l)
 
 
-class DoubleSphericalBessel(mcfit):
-    r"""Compute integrals with two spherical Bessel functions
-    .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
-                = \int_0^\infty F(x) j_{l_1}(xy_1) j_{l_2}(xy_2) \,x^2\d x
-
-    Parameters
-    ----------
-    alpha : float
-        y2 / y1
-    l : int, optional
-        default is 0
-    l1 : int, optional
-        default is l
-    l2 : int, optional
-        default is l
-    """
-    def __init__(self, x, alpha, l=0, l1=None, l2=None, q=1.5, N=None, lowring=True):
-        self.alpha = alpha
-        if l1 is None:
-            l1 = l
-        if l2 is None:
-            l2 = l
-        self.l1 = l1
-        self.l2 = l2
-        UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, l1, l2)
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
-        self.prefac *= self.x**3
+from .transforms import DoubleSphericalBessel # backward compatibility
 
 
 class TophatVar(mcfit):

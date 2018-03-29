@@ -196,6 +196,68 @@ The pair is symmetric when $q=\frac12$.
 \paragraph{Applications}
 
 
+\subparagraph{Double Bessel integral}
+\begin{equation}
+    G(y_1, y_2) = \int_0^\infty F(x) J_{\nu_1}(xy_1) J_{\nu_2}(xy_2) \,x\d x
+\end{equation}
+\begin{align}
+    y &\to y_1 \\
+    f(x) &= x^{2-q} F(x) \\
+    \alpha &\equiv y_2/y_1 \\
+    g(y_1; \alpha) &= y_1^q G(y_1, y_2 = \alpha y_1) \\
+    K(t; \alpha) &= J_{\nu_1}(t) J_{\nu_2}(\alpha t) \\
+    \Mellin_K(z; \alpha) &=
+    \begin{cases}
+        \displaystyle
+        \frac{2^{z-1} \alpha^{\nu_2} \Gamma\bigl(\frac{\nu_1+\nu_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{2+\nu_1-\nu_2-z}2\bigr) \Gamma\bigl(1+\nu_2\bigr)}
+        \,_2F_1\Bigl( \frac{-\nu_1+\nu_2+z}2, \frac{\nu_1+\nu_2+z}2, 1+\nu_2; \alpha^2 \Bigr)
+        & \quad 0<\alpha<1 \\[1em]
+        \displaystyle
+        \frac{2^{z-1} \Gamma\bigl(1-z\bigr) \Gamma\bigl(\frac{\nu_1+\nu_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{2+\nu_1-\nu_2-z}2\bigr) \Gamma\bigl(\frac{2-\nu_1+\nu_2-z}2\bigr)
+                \Gamma\bigl(\frac{2+\nu_1+\nu_2-z}2\bigr)}
+        & \quad \alpha=1 \\[1em]
+        \displaystyle
+        \frac{2^{z-1} \alpha^{-\nu_1-z} \Gamma\bigl(\frac{\nu_1+\nu_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{2-\nu_1+\nu_2-z}2\bigr) \Gamma\bigl(1+\nu_1\bigr)}
+        \,_2F_1\Bigl( \frac{\nu_1-\nu_2+z}2, \frac{\nu_1+\nu_2+z}2, 1+\nu_1; \alpha^{-2} \Bigr)
+        & \quad \alpha>1
+    \end{cases}
+\end{align}
+
+
+\subparagraph{Double Spherical Bessel integral}
+\begin{equation}
+    G(y_1, y_2) = \int_0^\infty F(x) j_{\nu_1}(xy_1) j_{\nu_2}(xy_2) \,x^2\d x
+\end{equation}
+\begin{align}
+    y &\to y_1 \\
+    f(x) &= x^{3-q} F(x) \\
+    \alpha &\equiv y_2/y_1 \\
+    g(y_1; \alpha) &= y_1^q G(y_1, y_2 = \alpha y_1) \\
+    K(t; \alpha) &= j_{\nu_1}(t) j_{\nu_2}(\alpha t) \\
+    \Mellin_K(z; \alpha) &=
+    \begin{cases}
+        \displaystyle
+        \frac{2^{z-3} \pi \alpha^{\nu_2} \Gamma\bigl(\frac{\nu_1+\nu_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{3+\nu_1-\nu_2-z}2\bigr) \Gamma\bigl(\frac32+\nu_2\bigr)}
+        \,_2F_1\Bigl( \frac{-1-\nu_1+\nu_2+z}2, \frac{\nu_1+\nu_2+z}2, \frac32+\nu_2; \alpha^2 \Bigr)
+        & \quad 0<\alpha<1 \\[1em]
+        \displaystyle
+        \frac{2^{z-3} \pi \Gamma\bigl(2-z\bigr) \Gamma\bigl(\frac{\nu_1+\nu_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{3+\nu_1-\nu_2-z}2\bigr) \Gamma\bigl(\frac{3-\nu_1+\nu_2-z}2\bigr)
+                \Gamma\bigl(\frac{4+\nu_1+\nu_2-z}2\bigr)}
+        & \quad \alpha=1 \\[1em]
+        \displaystyle
+        \frac{2^{z-3} \pi \alpha^{-\nu_1-z} \Gamma\bigl(\frac{\nu_1+\nu_2+z}2\bigr)}
+            {\Gamma\bigl(\frac{3-\nu_1+\nu_2-z}2\bigr) \Gamma\bigl(\frac32+\nu_1\bigr)}
+        \,_2F_1\Bigl( \frac{-1+\nu_1-\nu_2+z}2, \frac{\nu_1+\nu_2+z}2, \frac32+\nu_1; \alpha^{-2} \Bigr)
+        & \quad \alpha>1
+    \end{cases}
+\end{align}
+
+
 \subparagraph{Top-hat smoothing of a radial function}
 in $\mathbb{R}^d$
 \begin{equation}
@@ -271,31 +333,6 @@ also radial profile to its Fourier transform
 \end{align}
 with the rest the same as the spherical Bessel transform.
 The 2-pt function conversion pair is symmetric when $q=\frac32$.
-
-
-\subparagraph{Double Spherical Bessel integral}
-\begin{equation}
-    G(y_1, y_2) = \int_0^\infty F(x) j_{l_1}(xy_1) j_{l_2}(xy_2) \,x^2\d x
-\end{equation}
-\begin{align}
-    y &\to y_1 \\
-    f(x) &= x^{3-q} F(x) \\
-    \alpha &\equiv y_2/y_1 \\
-    g(y_1; \alpha) &= y_1^q G(y_1, y_2 = \alpha y_1) \\
-    K(t; \alpha) &= j_{l_1}(t) j_{l_2}(\alpha t) \\
-    \Mellin_K(z; \alpha) &=
-    \begin{cases}
-        \frac{2^{z-3} \pi \alpha^{l_2} \Gamma\bigl(\frac{l_1+l_2+z}2\bigr)}
-            {\Gamma\bigl(\frac{3+l_1-l_2-z}2\bigr) \Gamma\bigl(\frac32+l_2\bigr)}
-        \,_2F_1\bigl( \frac{-1-l_1+l_2+z}2, \frac{l_1+l_2+z}2, \frac32+l_2; \alpha^2 \bigr)
-        & \quad 0<\alpha\leq1 \\
-        \frac{2^{z-3} \pi \alpha^{-l_1-z} \Gamma\bigl(\frac{l_1+l_2+z}2\bigr)}
-            {\Gamma\bigl(\frac{3-l_1+l_2-z}2\bigr) \Gamma\bigl(\frac32+l_1\bigr)}
-        \,_2F_1\bigl( \frac{-1+l_1-l_2+z}2, \frac{l_1+l_2+z}2, \frac32+l_1; \alpha^{-2} \bigr)
-        & \quad \alpha>1
-    \end{cases}
-\end{align}
-\textbf{Find simplification when $\alpha=1$.}
 
 
 \subparagraph{Variance in a Top-hat window}

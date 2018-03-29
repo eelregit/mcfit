@@ -11,8 +11,8 @@ import numpy
 from scipy.special import gamma
 
 
-__all__ = ['Hankel', 'SphericalBessel', 'FourierSine', 'FourierCosine',
-           'TophatSmooth', 'GaussSmooth']
+__all__ = ['Hankel', 'SphericalBessel', 'DoubleBessel', 'DoubleSphericalBessel',
+            'FourierSine', 'FourierCosine', 'TophatSmooth', 'GaussSmooth']
 
 
 class Hankel(mcfit):
@@ -51,6 +51,72 @@ class FourierCosine(mcfit):
         UK = kernels.Mellin_FourierCosine()
         mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
         self.prefac *= self.x
+
+
+class DoubleBessel(mcfit):
+    r"""Compute integrals with two Bessel functions
+    .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
+                = \int_0^\infty F(x) J_{\nu_1}(xy_1) J_{\nu_2}(xy_2) \,x\d x
+
+    Parameters
+    ----------
+    alpha : float
+        y2 / y1
+    nu : float, optional
+        default is 0
+    nu1 : float, optional
+        default is nu
+    nu2 : float, optional
+        default is nu
+    """
+    def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, N=None, lowring=True):
+        self.alpha = alpha
+        if nu1 is None:
+            nu1 = nu
+        if nu2 is None:
+            nu2 = nu
+        self.nu1 = nu1
+        self.nu2 = nu2
+        UK = kernels.Mellin_DoubleBesselJ(alpha, nu1, nu2)
+        if q is None:
+            q = 1
+            if alpha == 1:
+                q = 0.5
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**2
+
+
+class DoubleSphericalBessel(mcfit):
+    r"""Compute integrals with two spherical Bessel functions
+    .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
+                = \int_0^\infty F(x) j_{\nu_1}(xy_1) j_{\nu_2}(xy_2) \,x^2\d x
+
+    Parameters
+    ----------
+    alpha : float
+        y2 / y1
+    nu : float, optional
+        default is 0
+    nu1 : float, optional
+        default is nu
+    nu2 : float, optional
+        default is nu
+    """
+    def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, N=None, lowring=True):
+        self.alpha = alpha
+        if nu1 is None:
+            nu1 = nu
+        if nu2 is None:
+            nu2 = nu
+        self.nu1 = nu1
+        self.nu2 = nu2
+        UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, nu1, nu2)
+        if q is None:
+            q = 1.5
+            if alpha == 1:
+                q = 1
+        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        self.prefac *= self.x**3
 
 
 class TophatSmooth(mcfit):
