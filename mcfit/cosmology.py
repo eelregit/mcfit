@@ -19,7 +19,8 @@ class P2xi(mcfit):
         self.l = l
         UK = kernels.Mellin_SphericalBesselJ(l)
         mcfit.__init__(self, k, UK, q, N=N, lowring=lowring)
-        self.prefac *= numpy.real_if_close(1j**l) / (2*numpy.pi)**1.5 * self.x**3
+        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1) # i^l
+        self.prefac *= phase / (2*numpy.pi)**1.5 * self.x**3
 
 
 class xi2P(mcfit):
@@ -31,7 +32,8 @@ class xi2P(mcfit):
         UK = kernels.Mellin_SphericalBesselJ(l)
         mcfit.__init__(self, r, UK, q, N=N, lowring=lowring)
         self.prefac *= self.x**3
-        self.postfac *= (2*numpy.pi)**1.5 / numpy.real_if_close(1j**l)
+        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1) # i^l
+        self.postfac *= (2*numpy.pi)**1.5 / phase
 
 
 from .transforms import DoubleSphericalBessel # backward compatibility
