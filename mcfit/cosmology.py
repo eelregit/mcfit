@@ -36,16 +36,13 @@ class xi2P(mcfit):
         self.postfac *= (2*numpy.pi)**1.5 / phase
 
 
-from .transforms import DoubleSphericalBessel # backward compatibility
-
-
 class TophatVar(mcfit):
     r"""Variance in a top-hat window.
 
     Examples
     --------
     To compute :math:`\sigma_8` of a linear power spectrum :math:`P(k)`, with
-    k in unit of :math:`h/\mathrm{Mpc}` and P in unit of :math:`\mathrm{Mpc}^3/h^3`
+    :math:`P` in unit of :math:`[k]^{-3}`
     >>> R, var = TophatVar(k)(P)
     >>> from scipy.interpolate import CubicSpline
     >>> varR = CubicSpline(R, var)
