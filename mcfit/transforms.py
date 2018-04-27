@@ -16,7 +16,7 @@ __all__ = ['Hankel', 'SphericalBessel', 'DoubleBessel', 'DoubleSphericalBessel',
 
 
 class Hankel(mcfit):
-    """Hankel transform pair
+    """Hankel transform pair.
     """
     def __init__(self, x, nu=0, q=1, N=None, lowring=True):
         self.nu = nu
@@ -26,7 +26,7 @@ class Hankel(mcfit):
 
 
 class SphericalBessel(mcfit):
-    """Spherical Bessel transform pair
+    """Spherical Bessel transform pair.
     """
     def __init__(self, x, nu=0, q=1.5, N=None, lowring=True):
         self.nu = nu
@@ -36,7 +36,7 @@ class SphericalBessel(mcfit):
 
 
 class FourierSine(mcfit):
-    """Fourier sine transform pair
+    """Fourier sine transform pair.
     """
     def __init__(self, x, q=0.5, N=None, lowring=True):
         UK = kernels.Mellin_FourierSine()
@@ -45,7 +45,7 @@ class FourierSine(mcfit):
 
 
 class FourierCosine(mcfit):
-    """Fourier cosine transform pair
+    """Fourier cosine transform pair.
     """
     def __init__(self, x, q=0.5, N=None, lowring=True):
         UK = kernels.Mellin_FourierCosine()
@@ -54,7 +54,8 @@ class FourierCosine(mcfit):
 
 
 class DoubleBessel(mcfit):
-    r"""Compute integrals with two Bessel functions
+    r"""Compute integrals with two Bessel functions.
+
     .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
                 = \int_0^\infty F(x) J_{\nu_1}(xy_1) J_{\nu_2}(xy_2) \,x\d x
 
@@ -87,7 +88,8 @@ class DoubleBessel(mcfit):
 
 
 class DoubleSphericalBessel(mcfit):
-    r"""Compute integrals with two spherical Bessel functions
+    r"""Compute integrals with two spherical Bessel functions.
+
     .. math:: G(y_1; \alpha) \equiv G(y_1, y_2=\alpha y_1)
                 = \int_0^\infty F(x) j_{\nu_1}(xy_1) j_{\nu_2}(xy_2) \,x^2\d x
 
@@ -120,7 +122,7 @@ class DoubleSphericalBessel(mcfit):
 
 
 class TophatSmooth(mcfit):
-    """Top-hat smoothing of a radial function
+    """Top-hat smoothing of a radial function.
     """
     def __init__(self, x, d=3, q=0, N=None, lowring=True):
         self.d = d
@@ -130,7 +132,7 @@ class TophatSmooth(mcfit):
 
 
 class GaussSmooth(mcfit):
-    """Gaussian smoothing of a radial function
+    """Gaussian smoothing of a radial function.
     """
     def __init__(self, x, d=3, q=0, N=None, lowring=True):
         self.d = d

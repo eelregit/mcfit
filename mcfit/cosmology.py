@@ -9,11 +9,11 @@ from . import kernels
 import numpy
 
 
-__all__ = ['P2xi', 'xi2P', 'DoubleSphericalBessel', 'TophatVar', 'GaussVar', 'ExcursionSet']
+__all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar', 'ExcursionSet']
 
 
 class P2xi(mcfit):
-    """Power spectrum to correlation function
+    """Power spectrum to correlation function.
     """
     def __init__(self, k, l=0, q=1.5, N=None, lowring=True):
         self.l = l
@@ -24,8 +24,8 @@ class P2xi(mcfit):
 
 
 class xi2P(mcfit):
-    """Correlation function to power spectrum,
-    also radial profile to its Fourier transform
+    """Correlation function to power spectrum, also radial profile to its
+    Fourier transform.
     """
     def __init__(self, r, l=0, q=1.5, N=None, lowring=True):
         self.l = l
@@ -40,7 +40,7 @@ from .transforms import DoubleSphericalBessel # backward compatibility
 
 
 class TophatVar(mcfit):
-    r"""Variance in a top-hat window
+    r"""Variance in a top-hat window.
 
     Examples
     --------
@@ -58,7 +58,7 @@ class TophatVar(mcfit):
 
 
 class GaussVar(mcfit):
-    """Variance in a Gaussian window
+    """Variance in a Gaussian window.
     """
     def __init__(self, k, q=1.5, N=None, lowring=True):
         UK = kernels.Mellin_GaussSq()
@@ -67,7 +67,8 @@ class GaussVar(mcfit):
 
 
 class ExcursionSet(mcfit):
-    """Excursion set trajectory
+    """Excursion set trajectory.
+
     BCEK 91 model
     """
     def __init__(self, k, q=0, N=None, lowring=True):
