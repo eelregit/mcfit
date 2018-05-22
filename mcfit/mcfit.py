@@ -1,4 +1,4 @@
-from __future__ import print_function, division
+from __future__ import division
 import numpy
 
 
@@ -341,23 +341,25 @@ class mcfit(object):
         fabs_l = fabs[:iQ1].mean()
         fabs_m = fabs[iQ1:iQ3].mean()
         fabs_r = fabs[iQ3:].mean()
+
+        import warnings
         if fabs_l > fabs_m:
-            print("left wing seems heavy: {:.2g} vs {:.2g}, "
-                    "change tilt and mind convergence".format(fabs_l, fabs_m))
+            warnings.warn("left wing seems heavy: {:.2g} vs {:.2g}, "
+                    "change tilt and mind convergence".format(fabs_l, fabs_m), RuntimeWarning)
         if fabs_m < fabs_r:
-            print("right wing seems heavy: {:.2g} vs {:.2g}, "
-                    "change tilt and mind convergence".format(fabs_m, fabs_r))
+            warnings.warn("right wing seems heavy: {:.2g} vs {:.2g}, "
+                    "change tilt and mind convergence".format(fabs_m, fabs_r), RuntimeWarning)
 
         if fabs[0] > fabs[1]:
-            print("left tail may blow up: {:.2g} vs {:.2g}, "
-                    "change tilt or avoid extrapolation".format(f[0], f[1]))
+            warnings.warn("left tail may blow up: {:.2g} vs {:.2g}, "
+                    "change tilt or avoid extrapolation".format(f[0], f[1]), RuntimeWarning)
         if fabs[-2] < fabs[-1]:
-            print("right tail may blow up: {:.2g} vs {:.2g}, "
-                    "change tilt or avoid extrapolation".format(f[-2], f[-1]))
+            warnings.warn("right tail may blow up: {:.2g} vs {:.2g}, "
+                    "change tilt or avoid extrapolation".format(f[-2], f[-1]), RuntimeWarning)
 
         if f[0]*f[1] <= 0:
-            print("left tail looks wiggly: {:.2g} vs {:.2g}, "
-                    "avoid extrapolation".format(f[0], f[1]))
+            warnings.warn("left tail looks wiggly: {:.2g} vs {:.2g}, "
+                    "avoid extrapolation".format(f[0], f[1]), RuntimeWarning)
         if f[-2]*f[-1] <= 0:
-            print("right tail looks wiggly: {:.2g} vs {:.2g}, "
-                    "avoid extrapolation".format(f[-2], f[-1]))
+            warnings.warn("right tail looks wiggly: {:.2g} vs {:.2g}, "
+                    "avoid extrapolation".format(f[-2], f[-1]), RuntimeWarning)
