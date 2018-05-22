@@ -6,13 +6,13 @@ class mcfit(object):
     r"""Compute integral transforms as a multiplicative convolution.
 
     The generic form is
-    .. math:: G(y) = \int_0^\infty F(x) K(xy) \,\frac{\mathrm{d}x}x
+    .. math:: G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x
 
     Here :math:`F(x)` is the input function, :math:`G(y)` is the output
     function, and :math:`K(xy)` is the integral kernel.
     One is free to scale all three functions by a power law
 
-    .. math:: g(y) = \int_0^\infty f(x) k(xy) \,\frac{\mathrm{d}x}x
+    .. math:: g(y) = \int_0^\infty f(x) k(xy) \frac{dx}x
 
     in which :math:`f(x) = x^{-q} F(x)`, :math:`g(y) = y^q G(y)`, and
     :math:`k(t) = t^q K(t)`.
@@ -25,17 +25,19 @@ class mcfit(object):
         log-evenly spaced input argument
     UK : callable
         Mellin transform of the kernel
-        .. math:: U_K(z) \equiv \int_0^\infty t^z K(t) \, \mathrm{d}t
+        .. math:: U_K(z) \equiv \int_0^\infty t^z K(t) dt
     q : float
-        power-law tilt, can be used to balance f at large and small x.
-        Avoid the singularities in UK
+        power-law tilt, can be used to balance :math:`f` at large and small
+        :math:`x`. Avoid the singularities in `UK`
     N : int, optional
         length of FFT, defaults to the smallest power of 2 that doubles the
-        length of x
+        length of `x`
     lowring : bool, optional
-        if True and N is even, set y according to the low-ringing condition,
-        otherwise
-        :math:`x_\mathrm{min} * y_\mathrm{max} = x_\mathrm{max} * y_\mathrm{min} = 1`
+        if True and `N` is even, set y according to the low-ringing condition,
+        otherwise see `xy`
+    xy : float, optional
+        reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` if
+        `lowring` is False or `N` is odd
 
     Attributes
     ----------
@@ -50,13 +52,11 @@ class mcfit(object):
     _y_ : (N,) ndarray
         padded output argument
     prefac : array_like
-        a function of x (excluding the tilt factor :math:`x^{-q}` to be added
-        automatically) to multiply before the convolution.
-        Set it to convert the integral to the generic form
+        a function of `x` (excluding the tilt factor :math:`x^{-q}` to be added
+        automatically) to multiply before the convolution
     postfac : array_like
-        a function of y (excluding the tilt factor :math:`y^{-q}` to be added
-        automatically) to multiply after the convolution.
-        Set it to convert the integral to the generic form
+        a function of `y` (excluding the tilt factor :math:`y^{-q}` to be added
+        automatically) to multiply after the convolution
 
     Methods
     -------
@@ -67,14 +67,14 @@ class mcfit(object):
     Examples
     --------
     >>> x = numpy.logspace(-3, 3, num=60, endpoint=False)
-    >>> F = 1 / (1 + x*x)**1.5
+    >>> A = 1 / (1 + x*x)**1.5
     >>> H = mcfit.mcfit(x, mcfit.kernels.Mellin_BesselJ(0), q=1)
-    >>> y, G = H(x**2 * F) # x^2 factor to reduce it to the generic form
-    >>> Gexact = numpy.exp(-y)
-    >>> numpy.allclose(G, Gexact)
+    >>> y, B = H(x**2 * A)
+    >>> Bexact = numpy.exp(-y)
+    >>> numpy.allclose(B, Bexact)
 
     More conveniently, use the Hankel transform subclass
-    >>> y, G = mcfit.transforms.Hankel(x)(F)
+    >>> y, B = mcfit.transforms.Hankel(x)(A)
 
     Notes
     -----
@@ -88,13 +88,14 @@ class mcfit(object):
             MNRAS, 312:257-284, February 2000.
     """
 
-    def __init__(self, x, UK, q, N=None, lowring=True, prefac=None, postfac=None):
+    def __init__(self, x, UK, q, N=None, lowring=True, xy=1, prefac=None, postfac=None):
         self.x = numpy.asarray(x)
         self.Nin = len(x)
         self.UK = UK
         self.q = q
         self.N = N
         self.lowring = lowring
+        self.xy = xy
         self._setup()
         self.prefac = 1 if prefac is None else prefac
         self.postfac = 1 if postfac is None else postfac
@@ -153,7 +154,7 @@ class mcfit(object):
         if self.N < self.Nin:
             raise ValueError("total length shorter than input length")
 
-        lnxy = 0 # = lnxmin + lnymax = lnxmax + lnymin
+        lnxy = numpy.log(self.xy)
         if self.lowring and self.N % 2 == 0:
             lnxy = Delta / numpy.pi * numpy.angle(self.UK(self.q + 1j * numpy.pi / Delta))
         self.y = numpy.exp(lnxy - Delta) / self.x[::-1]

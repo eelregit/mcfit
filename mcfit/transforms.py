@@ -18,38 +18,38 @@ __all__ = ['Hankel', 'SphericalBessel', 'DoubleBessel', 'DoubleSphericalBessel',
 class Hankel(mcfit):
     """Hankel transform pair.
     """
-    def __init__(self, x, nu=0, q=1, N=None, lowring=True):
+    def __init__(self, x, nu=0, q=1, **kwargs):
         self.nu = nu
         UK = kernels.Mellin_BesselJ(nu)
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**2
 
 
 class SphericalBessel(mcfit):
     """Spherical Bessel transform pair.
     """
-    def __init__(self, x, nu=0, q=1.5, N=None, lowring=True):
+    def __init__(self, x, nu=0, q=1.5, **kwargs):
         self.nu = nu
         UK = kernels.Mellin_SphericalBesselJ(nu)
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**3
 
 
 class FourierSine(mcfit):
     """Fourier sine transform pair.
     """
-    def __init__(self, x, q=0.5, N=None, lowring=True):
+    def __init__(self, x, q=0.5, **kwargs):
         UK = kernels.Mellin_FourierSine()
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x
 
 
 class FourierCosine(mcfit):
     """Fourier cosine transform pair.
     """
-    def __init__(self, x, q=0.5, N=None, lowring=True):
+    def __init__(self, x, q=0.5, **kwargs):
         UK = kernels.Mellin_FourierCosine()
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x
 
 
@@ -70,7 +70,7 @@ class DoubleBessel(mcfit):
     nu2 : float, optional
         default is nu
     """
-    def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, N=None, lowring=True):
+    def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, **kwargs):
         self.alpha = alpha
         if nu1 is None:
             nu1 = nu
@@ -83,7 +83,7 @@ class DoubleBessel(mcfit):
             q = 1
             if alpha == 1:
                 q = 0.5
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**2
 
 
@@ -104,7 +104,7 @@ class DoubleSphericalBessel(mcfit):
     nu2 : float, optional
         default is nu
     """
-    def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, N=None, lowring=True):
+    def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, **kwargs):
         self.alpha = alpha
         if nu1 is None:
             nu1 = nu
@@ -117,25 +117,25 @@ class DoubleSphericalBessel(mcfit):
             q = 1.5
             if alpha == 1:
                 q = 1
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**3
 
 
 class TophatSmooth(mcfit):
     """Top-hat smoothing of a radial function.
     """
-    def __init__(self, x, d=3, q=0, N=None, lowring=True):
+    def __init__(self, x, d=3, q=0, **kwargs):
         self.d = d
         UK = kernels.Mellin_Tophat(d)
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**d / (2**(d-1) * numpy.pi**(d/2) * gamma(d/2))
 
 
 class GaussSmooth(mcfit):
     """Gaussian smoothing of a radial function.
     """
-    def __init__(self, x, d=3, q=0, N=None, lowring=True):
+    def __init__(self, x, d=3, q=0, **kwargs):
         self.d = d
         UK = kernels.Mellin_Gauss()
-        mcfit.__init__(self, x, UK, q, N=N, lowring=lowring)
+        mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**d / (2**(d-1) * numpy.pi**(d/2) * gamma(d/2))
