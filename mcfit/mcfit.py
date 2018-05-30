@@ -33,8 +33,8 @@ class mcfit(object):
         length of FFT, defaults to the smallest power of 2 that doubles the
         length of `x`
     lowring : bool, optional
-        if True and `N` is even, set y according to the low-ringing condition,
-        otherwise see `xy`
+        if True and `N` is even, set `y` according to the low-ringing
+        condition, otherwise see `xy`
     xy : float, optional
         reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` if
         `lowring` is False or `N` is odd
@@ -129,13 +129,13 @@ class mcfit(object):
     @property
     def _x_(self):
         if not hasattr(self, "_x"):
-            self._x = self._pad(self.x, True, False)
+            self._x = self._pad(self.x, 0, True, False)
         return self._x
 
     @property
     def _y_(self):
         if not hasattr(self, "_y"):
-            self._y = self._pad(self.y, True, True)
+            self._y = self._pad(self.y, 0, True, True)
         return self._y
 
 
@@ -168,17 +168,20 @@ class mcfit(object):
         #    self._u[self.N//2] = self._u[self.N//2].real
 
 
-    def __call__(self, F, extrap=True, interp=False):
+    def __call__(self, F, axis=-1, extrap=True, interp=False):
         """Evaluate the integral.
 
         Parameters
         ----------
-        F : (Nin,) array_like
+        F : (..., Nin, ...) array_like
             input function, internally padded symmetrically to length N with
             power-law extrapolations or zeros
+        axis : int, optional
+            axis along which to integrate
         extrap : bool or 2-tuple of bools, optional
-            whether to extrapolate F with power laws or to just pad with zeros;
-            for a tuple, the two elements are for the left and right pads
+            whether to extrapolate `F` with power laws or to just pad with
+            zeros; for a tuple, the two elements are for the left and right
+            pads
         interp : bool, optional
             when True return an interpolant computed using padded input,
             otherwise return unpadded arrays
@@ -187,30 +190,33 @@ class mcfit(object):
         -------
         y : (Nin,) ndarray
             log-evenly spaced output argument, unpadded
-        G : (Nin,) ndarray
+        G : (..., Nin, ...) ndarray
             output function, unpadded
         Gy : scipy.interpolate.CubicSpline
             output interpolant computed using padded input
         """
-        if len(F) != self.Nin:
-            raise ValueError("lengths of input function and argument must match")
 
-        f = self._xfac * F
-        f = self._pad(f, extrap, False)
+        F = numpy.asarray(F)
+
+        to_axis = [1] * F.ndim
+        to_axis[axis] = -1
+
+        f = self._xfac.reshape(to_axis) * F
+        f = self._pad(f, axis, extrap, False)
 
         # convolution
-        f = numpy.fft.rfft(f) # f(x_n) -> f_m
-        g = f * self._u # f_m -> g_m
-        g = numpy.fft.hfft(g, n=self.N) / self.N # g_m -> g(y_n)
+        f = numpy.fft.rfft(f, axis=axis) # f(x_n) -> f_m
+        g = f * self._u.reshape(to_axis) # f_m -> g_m
+        g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N # g_m -> g(y_n)
 
         if not interp:
-            g = self._unpad(g, True)
-            G = self._yfac * g
+            g = self._unpad(g, axis, True)
+            G = self._yfac.reshape(to_axis) * g
             return self.y, G
         else:
-            _G_ = self._pad(self._yfac, True, True) * g
+            _G_ = self._pad(self._yfac, 0, True, True).reshape(to_axis) * g
             from scipy.interpolate import CubicSpline
-            Gy = CubicSpline(self._y_, _G_)
+            Gy = CubicSpline(self._y_, _G_, axis=axis)
             return Gy
 
 
@@ -227,26 +233,26 @@ class mcfit(object):
         -------
         If full is False, output separately
         a : (1, N) ndarray
-            "After" factor, function of y including the `postfac` and the
+            "After" factor, function of `y` including the `postfac` and the
             power-law tilt
         b : (N,) ndarray
-            "Before" factor, function of x including the `prefac` and the
+            "Before" factor, function of `x` including the `prefac` and the
             power-law tilt
         C : (N, N) ndarray
             Convolution matrix, circulant
 
-        Otherwise, output the full matrix, combining a, b, and C
+        Otherwise, output the full matrix, combining `a`, `b`, and `C`
         M : (N, N) ndarray
             Full transformation matrix, `M = a * C * b`
 
         Notes
         -----
-        M, a, b, and C are padded.
+        `M`, `a`, `b`, and `C` are padded.
 
         This is not meant for evaluation with matrix multiplication but in case
         one is interested in the tranformation itself.
 
-        When N is even and lowing is False, :math:`C C^{-1}` and :math:`M
+        When `N` is even and `lowring` is False, :math:`C C^{-1}` and :math:`M
         M^{-1}` can deviate from the identity matrix because the imaginary part
         of the Nyquist modes are dropped.
 
@@ -257,6 +263,7 @@ class mcfit(object):
         Thus :math:`1/u_m` are the eigenvalues of the inverse convolution
         matrix.
         """
+
         a = self._pad(self._yfac, True, True)[:, numpy.newaxis]
         b = self._pad(self._xfac, True, False)
         v = numpy.fft.hfft(self._u, n=self.N) / self.N
@@ -268,21 +275,28 @@ class mcfit(object):
             return a * C * b
 
 
-    def _pad(self, a, extrap, out):
+    def _pad(self, a, axis, extrap, out):
         """Pad an array with power-law extrapolations or zeros.
 
         Parameters
         ----------
-        a : (Nin,) ndarray
-            array to be padded to length N
+        a : (..., Nin, ...) ndarray
+            array to be padded to length `N`
+        axis : int
+            axis along which to pad
         extrap : bool or 2-tuple of bools
-            whether to extrapolate a with power laws or to just pad with zeros;
-            for a tuple, the two elements are for the left and right pads
+            whether to extrapolate `a` with power laws or to just pad with
+            zeros; for a tuple, the two elements are for the left and right
+            pads
         out : bool
-            pad the input when False, otherwise the output;
-            the two cases have their left and right pad sizes reversed
+            pad the output if True, otherwise the input; the two cases have
+            their left and right pad sizes reversed
         """
-        assert len(a) == self.Nin
+
+        assert a.shape[axis] == self.Nin
+
+        to_axis = [1] * a.ndim
+        to_axis[axis] = -1
 
         if isinstance(extrap, bool):
             _extrap = extrap_ = extrap
@@ -298,29 +312,38 @@ class mcfit(object):
         else:
             _Npad, Npad_ = Npad//2, Npad - Npad//2
         if _extrap:
-            _a = a[0] * (a[1] / a[0]) ** numpy.arange(-_Npad, 0)
+            start = numpy.take(a, [0], axis=axis)
+            ratio = numpy.take(a, [1], axis=axis) / start
+            exp = numpy.arange(-_Npad, 0).reshape(to_axis)
+            _a = start * ratio ** exp
         else:
-            _a = numpy.zeros(_Npad)
+            _a = numpy.zeros(a.shape[:axis] + (_Npad,) + a.shape[axis+1:])
         if extrap_:
-            a_ = a[-1] * (a[-1] / a[-2]) ** numpy.arange(1, Npad_ + 1)
+            start = numpy.take(a, [-1], axis=axis)
+            ratio = start / numpy.take(a, [-2], axis=axis)
+            exp = numpy.arange(1, Npad_ + 1).reshape(to_axis)
+            a_ = start * ratio ** exp
         else:
-            a_ = numpy.zeros(Npad_)
+            a_ = numpy.zeros(a.shape[:axis] + (Npad_,) + a.shape[axis+1:])
 
-        return numpy.concatenate((_a, a, a_))
+        return numpy.concatenate((_a, a, a_), axis=axis)
 
 
-    def _unpad(self, a, out):
+    def _unpad(self, a, axis, out):
         """Undo padding in an array.
 
         Parameters
         ----------
-        a : (N,) ndarray
-            array to be trimmed to length Nin
+        a : (..., N, ...) ndarray
+            array to be trimmed to length `Nin`
+        axis : int
+            axis along which to unpad
         out : bool
-            trim the output when True, otherwise the input;
-            the two cases have their left and right pad sizes reversed
+            trim the output if True, otherwise the input; the two cases have
+            their left and right pad sizes reversed
         """
-        assert len(a) == self.N
+
+        assert a.shape[axis] == self.N
 
         Npad = self.N - self.Nin
         if out:
@@ -328,12 +351,15 @@ class mcfit(object):
         else:
             _Npad, Npad_ = Npad//2, Npad - Npad//2
 
-        return a[_Npad : self.N - Npad_]
+        return numpy.take(a, range(_Npad, self.N - Npad_), axis=axis)
 
 
     def check(self, F):
         """Rough sanity checks on the input function.
         """
+
+        assert F.ndim == 1, "checker only supports 1D"
+
         f = self._xfac * F
         fabs = numpy.abs(f)
 
