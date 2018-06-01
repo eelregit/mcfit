@@ -32,7 +32,7 @@ class mcfit(object):
     N : int, optional
         length of FFT, defaults to the smallest power of 2 that doubles the
         length of `x`; the input function is padded symmetrically to this
-        length with extrapolations or zeros before integration
+        length with extrapolations or zeros before convolution
     lowring : bool, optional
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
@@ -89,7 +89,7 @@ class mcfit(object):
             MNRAS, 312:257-284, February 2000.
     """
 
-    def __init__(self, x, UK, q, N=None, lowring=True, xy=1, prefac=None, postfac=None):
+    def __init__(self, x, UK, q, N=None, lowring=True, xy=1):
         self.x = numpy.asarray(x)
         self.Nin = len(x)
         self.UK = UK
@@ -97,16 +97,10 @@ class mcfit(object):
         self.N = N
         self.lowring = lowring
         self.xy = xy
+
         self._setup()
-        self.prefac = 1 if prefac is None else prefac
-        self.postfac = 1 if postfac is None else postfac
-        if prefac is not None or postfac is not None:
-            import warnings
-            msg = "prefac and postfac as parameters are deprecated. " \
-            "Use them as attributes instead. See cosmology.xi2P.__init__ " \
-            "for an example. This gives the flexibility that postfac can " \
-            "be made a function of the output argument."
-            warnings.warn(msg, FutureWarning)
+        self.prefac = 1
+        self.postfac = 1
 
 
     @property
@@ -141,8 +135,6 @@ class mcfit(object):
 
 
     def _setup(self):
-        """Validate x, set N and y, and compute :math:`u_m`.
-        """
         if self.Nin < 2:
             raise ValueError("input length too short")
         Delta = numpy.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
@@ -180,7 +172,7 @@ class mcfit(object):
             axis along which to integrate
         extrap : bool or 2-tuple of bools, optional
             whether to extrapolate `F` with power laws or to pad it with zeros,
-            to length `N`, before integration; for a tuple, the two elements
+            to length `N`, before convolution; for a tuple, the two elements
             are for the left and right pads
         keeppads : bool, optional
             whether to keep the padding in the output
