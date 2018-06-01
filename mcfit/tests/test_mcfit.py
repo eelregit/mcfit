@@ -31,12 +31,16 @@ def test_matrix():
 def test_pad():
     x = numpy.logspace(-3, 3, num=6, endpoint=False)
     _x_ = numpy.logspace(-6, 6, num=13, endpoint=True)
-    y, _y_ = 1/x[::-1], 1/_x_[::-1]
+    y = numpy.logspace(-3, 3, num=6, endpoint=False)
+    _y_ = numpy.logspace(-7, 5, num=13, endpoint=True)
 
-    H = Hankel(x, N=13)
+    H = Hankel(x, N=13, xy=1)
 
-    assert_allclose(H._pad(x, True, False), _x_)
-    assert_allclose(H._pad(y, True, True), _y_)
+    assert_allclose(H._x_, _x_)
+    assert_allclose(H._y_, _y_)
 
-    assert_allclose(H._unpad(_x_, False), x)
-    assert_allclose(H._unpad(_y_, True), y)
+    assert_allclose(H._pad(x, 0, True, False), _x_)
+    assert_allclose(H._pad(y, 0, True, True), _y_)
+
+    assert_allclose(H._unpad(_x_, 0, False), x)
+    assert_allclose(H._unpad(_y_, 0, True), y)
