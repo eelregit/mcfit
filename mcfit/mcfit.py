@@ -31,7 +31,8 @@ class mcfit(object):
         :math:`x`. Avoid the singularities in `UK`
     N : int, optional
         length of FFT, defaults to the smallest power of 2 that doubles the
-        length of `x`
+        length of `x`; the input function is padded symmetrically to this
+        length with extrapolations or zeros before integration
     lowring : bool, optional
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
@@ -42,11 +43,11 @@ class mcfit(object):
     Attributes
     ----------
     Nin : int
-        input length
+        (unpadded) input (and output) length
     x : (Nin,) ndarray
-        log-evenly spaced input argument
+        (unpadded) input argument
     y : (Nin,) ndarray
-        log-evenly spaced output argument
+        (unpadded) output argument
     _x_ : (N,) ndarray
         padded input argument
     _y_ : (N,) ndarray
@@ -168,32 +169,33 @@ class mcfit(object):
         #    self._u[self.N//2] = self._u[self.N//2].real
 
 
-    def __call__(self, F, axis=-1, extrap=True, interp=False):
+    def __call__(self, F, axis=-1, extrap=True, keeppads=False):
         """Evaluate the integral.
 
         Parameters
         ----------
         F : (..., Nin, ...) array_like
-            input function, internally padded symmetrically to length N with
-            power-law extrapolations or zeros
+            input function
         axis : int, optional
             axis along which to integrate
         extrap : bool or 2-tuple of bools, optional
-            whether to extrapolate `F` with power laws or to just pad with
-            zeros; for a tuple, the two elements are for the left and right
-            pads
-        interp : bool, optional
-            when True return an interpolant computed using padded input,
-            otherwise return unpadded arrays
+            whether to extrapolate `F` with power laws or to pad it with zeros,
+            to length `N`, before integration; for a tuple, the two elements
+            are for the left and right pads
+        keeppads : bool, optional
+            whether to keep the padding in the output
 
         Returns
         -------
-        y : (Nin,) ndarray
-            log-evenly spaced output argument, unpadded
-        G : (..., Nin, ...) ndarray
-            output function, unpadded
-        Gy : scipy.interpolate.CubicSpline
-            output interpolant computed using padded input
+        y : (Nin,) or (N,) ndarray
+            log-evenly spaced output argument
+        G : (..., Nin, ...) or (..., N, ...) ndarray
+            output function
+
+        Notes
+        -----
+        `y`, and `G` are unpadded by default. Pads can be kept if `keeppads` is
+        set to True.
         """
 
         F = numpy.asarray(F)
@@ -209,18 +211,16 @@ class mcfit(object):
         g = f * self._u.reshape(to_axis) # f_m -> g_m
         g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N # g_m -> g(y_n)
 
-        if not interp:
+        if not keeppads:
             g = self._unpad(g, axis, True)
             G = self._yfac.reshape(to_axis) * g
             return self.y, G
         else:
             _G_ = self._pad(self._yfac, 0, True, True).reshape(to_axis) * g
-            from scipy.interpolate import CubicSpline
-            Gy = CubicSpline(self._y_, _G_, axis=axis)
-            return Gy
+            return self._y_, _G_
 
 
-    def matrix(self, full=False):
+    def matrix(self, full=False, keeppads=True):
         """Return matrix form of the integral transform.
 
         Parameters
@@ -228,26 +228,29 @@ class mcfit(object):
         full : bool, optional
             when False return two vector factors and convolution matrix
             separately, otherwise return full transformation matrix
+        keeppads : bool, optional
+            whether to keep the padding in the output
 
         Returns
         -------
         If full is False, output separately
-        a : (1, N) ndarray
+        a : (1, N) or (1, Nin) ndarray
             "After" factor, function of `y` including the `postfac` and the
             power-law tilt
-        b : (N,) ndarray
+        b : (N,) or (Nin,) ndarray
             "Before" factor, function of `x` including the `prefac` and the
             power-law tilt
-        C : (N, N) ndarray
+        C : (N, N) or (Nin, Nin) ndarray
             Convolution matrix, circulant
 
         Otherwise, output the full matrix, combining `a`, `b`, and `C`
-        M : (N, N) ndarray
+        M : (N, N) or (Nin, Nin) ndarray
             Full transformation matrix, `M = a * C * b`
 
         Notes
         -----
-        `M`, `a`, `b`, and `C` are padded.
+        `M`, `a`, `b`, and `C` are padded by default. Pads can be discarded if
+        `keeppads` is set to False.
 
         This is not meant for evaluation with matrix multiplication but in case
         one is interested in the tranformation itself.
@@ -264,11 +267,21 @@ class mcfit(object):
         matrix.
         """
 
-        a = self._pad(self._yfac, True, True)[:, numpy.newaxis]
-        b = self._pad(self._xfac, True, False)
+        if keeppads:
+            a = self._pad(self._yfac, 0, True, True)
+            b = self._pad(self._xfac, 0, True, False)
+        else:
+            a = self._yfac.copy()
+            b = self._xfac.copy()
+        a = a.reshape(-1, 1)
+
         v = numpy.fft.hfft(self._u, n=self.N) / self.N
         idx = sum(numpy.ogrid[0:self.N, -self.N:0])
         C = v[idx] # follow scipy.linalg.{circulant,toeplitz,hankel}
+        if not keeppads:
+            C = self._unpad(C, 0, True)
+            C = self._unpad(C, 1, False)
+
         if not full:
             return a, b, C
         else:
@@ -298,13 +311,7 @@ class mcfit(object):
         to_axis = [1] * a.ndim
         to_axis[axis] = -1
 
-        if isinstance(extrap, bool):
-            _extrap = extrap_ = extrap
-        elif isinstance(extrap, tuple) and len(extrap) == 2 and \
-                all(isinstance(e, bool) for e in extrap):
-            _extrap, extrap_ = extrap
-        else:
-            raise TypeError("extrap neither one bool nor a tuple of two")
+        _extrap, extrap_ = extrap, extrap if numpy.isscalar(extrap) else extrap
 
         Npad = self.N - self.Nin
         if out:
