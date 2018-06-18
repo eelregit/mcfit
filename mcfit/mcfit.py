@@ -121,18 +121,6 @@ class mcfit(object):
         self._postfac = value
         self._yfac = self._postfac * self.y**(-self.q)
 
-    @property
-    def _x_(self):
-        if not hasattr(self, "_x"):
-            self._x = self._pad(self.x, 0, True, False)
-        return self._x
-
-    @property
-    def _y_(self):
-        if not hasattr(self, "_y"):
-            self._y = self._pad(self.y, 0, True, True)
-        return self._y
-
 
     def _setup(self):
         if self.Nin < 2:
@@ -151,6 +139,9 @@ class mcfit(object):
         if self.lowring and self.N % 2 == 0:
             lnxy = Delta / numpy.pi * numpy.angle(self.UK(self.q + 1j * numpy.pi / Delta))
         self.y = numpy.exp(lnxy - Delta) / self.x[::-1]
+
+        self._x_ = self._pad(self.x, 0, True, False)
+        self._y_ = self._pad(self.y, 0, True, True)
 
         m = numpy.arange(0, self.N//2 + 1)
         self._u = self.UK(self.q + 2j * numpy.pi / self.N / Delta * m)
