@@ -40,21 +40,22 @@ easily as follows
 
 .. code-block:: python
 
+    def F_fun(x): return 1 / (1 + x*x)**1.5
+    def G_fun(y): return numpy.exp(-y)
+
     from mcfit import Hankel
 
     x = numpy.logspace(-3, 3, num=60, endpoint=False)
-    F = 1 / (1 + x*x)**1.5
-    H0 = Hankel(x, nu=0, q=1, N=128, lowring=True)
-    y, G = H0(F)
-    Gexact = numpy.exp(-y)
-    numpy.allclose(G, Gexact, rtol=1e-8, atol=1e-8)
+    F = F_fun(x)
+    H = Hankel(x)
+    y, G = H(F)
+    numpy.allclose(G, G_fun(y), rtol=1e-8, atol=1e-8)
 
     y = numpy.logspace(-4, 2, num=60, endpoint=False)
-    G = numpy.exp(-y)
-    H1 = Hankel(y, nu=0, q=1, N=128, lowring=True)
-    x, F = H1(G)
-    Fexact = 1 / (1 + x*x)**1.5
-    numpy.allclose(F, Fexact, rtol=1e-10, atol=1e-10)
+    G = G_fun(y)
+    H_inv = Hankel(y)
+    x, F = H_inv(G)
+    numpy.allclose(F, F_fun(x), rtol=1e-10, atol=1e-10)
 
 Cosmologists often need to transform a power spectrum to its correlation
 function

@@ -71,8 +71,7 @@ class mcfit(object):
     >>> A = 1 / (1 + x*x)**1.5
     >>> H = mcfit.mcfit(x, mcfit.kernels.Mellin_BesselJ(0), q=1)
     >>> y, B = H(x**2 * A)
-    >>> Bexact = numpy.exp(-y)
-    >>> numpy.allclose(B, Bexact)
+    >>> numpy.allclose(B, numpy.exp(-y))
 
     More conveniently, use the Hankel transform subclass
     >>> y, B = mcfit.transforms.Hankel(x)(A)
