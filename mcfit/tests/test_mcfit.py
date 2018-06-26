@@ -29,6 +29,7 @@ def test_matrix():
 
 
 def test_pad():
+    # _x_, _y_, extrap pad, and unpad
     x = numpy.logspace(-3, 3, num=6, endpoint=False)
     _x_ = numpy.logspace(-6, 6, num=13, endpoint=True)
     y = numpy.logspace(-3, 3, num=6, endpoint=False)
@@ -44,3 +45,13 @@ def test_pad():
 
     assert_allclose(H._unpad(_x_, 0, False), x)
     assert_allclose(H._unpad(_y_, 0, True), y)
+
+    # zero pad and axis
+    a = b = numpy.ones((6, 6))
+    _a_ = numpy.zeros((13, 6))
+    _a_[3:9, :] = 1
+    _b_ = numpy.zeros((6, 13))
+    _b_[:, 4:10] = 1
+
+    assert_allclose(H._pad(a, 0, False, False), _a_)
+    assert_allclose(H._pad(b, 1, False, True), _b_)
