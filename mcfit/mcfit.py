@@ -288,6 +288,8 @@ class mcfit(object):
             their left and right pad sizes reversed
         """
 
+        if axis == -1: axis += a.ndim # to fix the indexing below with axis+1
+
         assert a.shape[axis] == self.Nin
 
         to_axis = [1] * a.ndim
