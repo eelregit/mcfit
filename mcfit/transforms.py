@@ -114,9 +114,9 @@ class DoubleSphericalBessel(mcfit):
         self.nu2 = nu2
         UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, nu1, nu2)
         if q is None:
-            q = 1.5
+            q = 2
             if alpha == 1:
-                q = 1
+                q = 1.5
         mcfit.__init__(self, x, UK, q, **kwargs)
         self.prefac *= self.x**3
 
