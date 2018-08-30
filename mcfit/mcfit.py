@@ -37,27 +37,37 @@ class mcfit(object):
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
     xy : float, optional
-        reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` if
+        reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` when
         `lowring` is False or `N` is odd
 
     Attributes
     ----------
     Nin : int
-        (unpadded) input (and output) length
+        input (and output) length
     x : (Nin,) ndarray
-        (unpadded) input argument
+        input argument
     y : (Nin,) ndarray
-        (unpadded) output argument
+        output argument
     _x_ : (N,) ndarray
-        padded input argument
+        padded `x`
     _y_ : (N,) ndarray
-        padded output argument
+        padded `y`
     prefac : array_like
-        a function of `x` (excluding the tilt factor :math:`x^{-q}` to be added
-        automatically) to multiply before the convolution
+        a function of `x` (excluding the tilt factor :math:`x^{-q}`) to
+        convert an integral to the normal form
     postfac : array_like
-        a function of `y` (excluding the tilt factor :math:`y^{-q}` to be added
-        automatically) to multiply after the convolution
+        a function of `y` (excluding the tilt factor :math:`y^{-q}`) to
+        convert an integral to the normal form
+    xfac : (Nin,) ndarray
+        a function of `x` (including the tilt factor :math:`x^{-q}`) to
+        multiply before the convolution
+    yfac : (Nin,) ndarray
+        a function of `y` (including the tilt factor :math:`y^{-q}`) to
+        multiply after the convolution
+    _xfac_ : (N,) ndarray
+        padded `_xfac_`
+    _yfac_ : (N,) ndarray
+        padded `_yfac_`
 
     Methods
     -------
@@ -109,7 +119,8 @@ class mcfit(object):
     @prefac.setter
     def prefac(self, value):
         self._prefac = value
-        self._xfac = self._prefac * self.x**(-self.q)
+        self.xfac = self._prefac * self.x**(-self.q)
+        self._xfac_ = self._pad(self.xfac, 0, True, False)
 
     @property
     def postfac(self):
@@ -118,7 +129,8 @@ class mcfit(object):
     @postfac.setter
     def postfac(self, value):
         self._postfac = value
-        self._yfac = self._postfac * self.y**(-self.q)
+        self.yfac = self._postfac * self.y**(-self.q)
+        self._yfac_ = self._pad(self.yfac, 0, True, True)
 
 
     def _setup(self):
@@ -185,8 +197,7 @@ class mcfit(object):
         to_axis = [1] * F.ndim
         to_axis[axis] = -1
 
-        f = self._xfac.reshape(to_axis) * F
-        f = self._pad(f, axis, extrap, False)
+        f = self._xfac_.reshape(to_axis) * self._pad(F, axis, extrap, False)
 
         # convolution
         f = numpy.fft.rfft(f, axis=axis) # f(x_n) -> f_m
@@ -194,11 +205,10 @@ class mcfit(object):
         g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N # g_m -> g(y_n)
 
         if not keeppads:
-            g = self._unpad(g, axis, True)
-            G = self._yfac.reshape(to_axis) * g
+            G = self.yfac.reshape(to_axis) * self._unpad(g, axis, True)
             return self.y, G
         else:
-            _G_ = self._pad(self._yfac, 0, True, True).reshape(to_axis) * g
+            _G_ = self._yfac_.reshape(to_axis) * g
             return self._y_, _G_
 
 
@@ -217,11 +227,9 @@ class mcfit(object):
         -------
         If full is False, output separately
         a : (1, N) or (1, Nin) ndarray
-            "After" factor, function of `y` including the `postfac` and the
-            power-law tilt
+            "After" factor, `_yfac_` or `yfac`
         b : (N,) or (Nin,) ndarray
-            "Before" factor, function of `x` including the `prefac` and the
-            power-law tilt
+            "Before" factor, `_xfac_` or `xfac`
         C : (N, N) or (Nin, Nin) ndarray
             Convolution matrix, circulant
 
@@ -249,20 +257,19 @@ class mcfit(object):
         matrix.
         """
 
-        if keeppads:
-            a = self._pad(self._yfac, 0, True, True)
-            b = self._pad(self._xfac, 0, True, False)
-        else:
-            a = self._yfac.copy()
-            b = self._xfac.copy()
-        a = a.reshape(-1, 1)
-
         v = numpy.fft.hfft(self._u, n=self.N) / self.N
         idx = sum(numpy.ogrid[0:self.N, -self.N:0])
         C = v[idx] # follow scipy.linalg.{circulant,toeplitz,hankel}
-        if not keeppads:
+
+        if keeppads:
+            a = self._yfac_.copy()
+            b = self._xfac_.copy()
+        else:
+            a = self.yfac.copy()
+            b = self.xfac.copy()
             C = self._unpad(C, 0, True)
             C = self._unpad(C, 1, False)
+        a = a.reshape(-1, 1)
 
         if not full:
             return a, b, C
@@ -351,7 +358,7 @@ class mcfit(object):
 
         assert F.ndim == 1, "checker only supports 1D"
 
-        f = self._xfac * F
+        f = self.xfac * F
         fabs = numpy.abs(f)
 
         iQ1, iQ3 = numpy.searchsorted(fabs.cumsum(), numpy.array([0.25, 0.75]) * fabs.sum())
