@@ -302,7 +302,7 @@ class mcfit(object):
         to_axis = [1] * a.ndim
         to_axis[axis] = -1
 
-        _extrap, extrap_ = extrap, extrap if numpy.isscalar(extrap) else extrap
+        _extrap, extrap_ = (extrap, extrap) if numpy.isscalar(extrap) else extrap
 
         Npad = self.N - self.Nin
         if out:
