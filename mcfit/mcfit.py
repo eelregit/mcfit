@@ -30,20 +30,24 @@ class mcfit(object):
         power-law tilt, can be used to balance :math:`f` at large and small
         :math:`x`. Avoid the singularities in `UK`
     N : int, optional
-        length of FFT, defaults to the smallest power of 2 that doubles the
-        length of `x`; the input function is padded symmetrically to this
-        length with extrapolations or zeros before convolution
+        size of FFT, defaults to the smallest power of 2 that at least doubles
+        the size of `x`; the input function is padded symmetrically to this
+        size with extrapolations or zeros before convolution
     lowring : bool, optional
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
     xy : float, optional
         reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` when
-        `lowring` is False or `N` is odd
+        `lowring` is False or `N` is odd.
+        `xy = x[1] * y[-1] = ... = x[i] * y[-i] = ... = x[-1] * y[1]`.
+        Note that :math:`x_{max}` is not included in `x` but bigger than
+        `x.max()` by one logarithmic interval due to the discretization of the
+        periodic approximant, and likewise for :math:`y_{max}`
 
     Attributes
     ----------
     Nin : int
-        input (and output) length
+        input (and output) size
     x : (Nin,) ndarray
         input argument
     y : (Nin,) ndarray
@@ -135,7 +139,7 @@ class mcfit(object):
 
     def _setup(self):
         if self.Nin < 2:
-            raise ValueError("input length too short")
+            raise ValueError("input size too short")
         Delta = numpy.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
         if not numpy.allclose(self.x[1:] / self.x[:-1], numpy.exp(Delta), rtol=1e-3):
             raise ValueError("input not log-evenly spaced")
@@ -144,7 +148,7 @@ class mcfit(object):
             folds = int(numpy.ceil(numpy.log2(self.Nin))) + 1
             self.N = 2**folds
         if self.N < self.Nin:
-            raise ValueError("total length shorter than input length")
+            raise ValueError("FFT size shorter than input size")
 
         lnxy = numpy.log(self.xy)
         if self.lowring and self.N % 2 == 0:
@@ -174,8 +178,8 @@ class mcfit(object):
             axis along which to integrate
         extrap : bool or 2-tuple of bools, optional
             whether to extrapolate `F` with power laws or to pad it with zeros,
-            to length `N`, before convolution; for a tuple, the two elements
-            are for the left and right pads
+            to size `N`, before convolution; for a tuple, the two elements are
+            for the left and right pads
         keeppads : bool, optional
             whether to keep the padding in the output
 
@@ -283,7 +287,7 @@ class mcfit(object):
         Parameters
         ----------
         a : (..., Nin, ...) ndarray
-            array to be padded to length `N`
+            array to be padded to size `N`
         axis : int
             axis along which to pad
         extrap : bool or 2-tuple of bools
@@ -333,7 +337,7 @@ class mcfit(object):
         Parameters
         ----------
         a : (..., N, ...) ndarray
-            array to be trimmed to length `Nin`
+            array to be trimmed to size `Nin`
         axis : int
             axis along which to unpad
         out : bool
