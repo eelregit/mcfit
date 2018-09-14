@@ -167,7 +167,7 @@ class mcfit(object):
         #    self._u[self.N//2] = self._u[self.N//2].real
 
 
-    def __call__(self, F, axis=-1, extrap=True, keeppads=False):
+    def __call__(self, F, axis=-1, extrap=True, keeppads=False, convonly=False):
         """Evaluate the integral.
 
         Parameters
@@ -182,6 +182,9 @@ class mcfit(object):
             for the left and right pads
         keeppads : bool, optional
             whether to keep the padding in the output
+        convonly : bool, optional
+            whether to skip the scaling by `_xfac_` and `_yfac_`, useful for
+            evaluating integral with multiple kernels
 
         Returns
         -------
@@ -201,7 +204,9 @@ class mcfit(object):
         to_axis = [1] * F.ndim
         to_axis[axis] = -1
 
-        f = self._xfac_.reshape(to_axis) * self._pad(F, axis, extrap, False)
+        f = self._pad(F, axis, extrap, False)
+        if not convonly:
+            f = self._xfac_.reshape(to_axis) * f
 
         # convolution
         f = numpy.fft.rfft(f, axis=axis) # f(x_n) -> f_m
@@ -209,10 +214,14 @@ class mcfit(object):
         g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N # g_m -> g(y_n)
 
         if not keeppads:
-            G = self.yfac.reshape(to_axis) * self._unpad(g, axis, True)
+            G = self._unpad(g, axis, True)
+            if not convonly:
+                G = self.yfac.reshape(to_axis) * G
             return self.y, G
         else:
-            _G_ = self._yfac_.reshape(to_axis) * g
+            _G_ = g
+            if not convonly:
+                _G_ = self._yfac_.reshape(to_axis) * _G_
             return self._y_, _G_
 
 
