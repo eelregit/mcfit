@@ -42,9 +42,9 @@ periodic approximant, and use the exact Fourier transform of the kernel.
 We can calculate the latter analytically as a Mellin transform.
 This algorithm is optimal if $f$ can be accurately approximated by a sum of
 finite Fourier modes and logarithmically uniform discretization, i.e.\ when
-$f(x)$ is smooth and spans a large range in $\ln x$.
-And it is ideal for oscillatory kernels which is problematic for the usual
-quadrature methods.
+$f(x)$ is smooth in $\ln x$.
+And it is ideal for oscillatory kernels with input spanning a wide range in
+$\ln x$, which is difficult to converge using the usual quadrature methods.
 
 
 \paragraph{Derivation} largely follows \cite{Hamilton00}.

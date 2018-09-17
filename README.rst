@@ -22,9 +22,9 @@ It approximates the input function with truncated Fourier series over one
 period of the periodic approximant, and use the exact Fourier transform of the
 kernel.
 One can calculate the latter analytically as a Mellin transform.
-This algorithm is optimal when the input function is smooth and spans a large
-range in :math:`\ln x`, and is ideal for oscillatory kernels which is
-problematic for the usual quadrature methods.
+This algorithm is optimal when the input function is smooth in :math:`\ln x`,
+and is ideal for oscillatory kernels with input spanning a wide range in
+:math:`\ln x`.
 
 
 Examples
