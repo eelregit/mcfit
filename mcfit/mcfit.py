@@ -56,6 +56,8 @@ class mcfit(object):
         padded `x`
     _y_ : (N,) ndarray
         padded `y`
+    xy : float
+        reciprocal product
     prefac : array_like
         a function of `x` (excluding the tilt factor :math:`x^{-q}`) to
         convert an integral to the normal form
@@ -150,9 +152,11 @@ class mcfit(object):
         if self.N < self.Nin:
             raise ValueError("FFT size shorter than input size")
 
-        lnxy = numpy.log(self.xy)
         if self.lowring and self.N % 2 == 0:
             lnxy = Delta / numpy.pi * numpy.angle(self.UK(self.q + 1j * numpy.pi / Delta))
+            self.xy = numpy.exp(lnxy)
+        else:
+            lnxy = numpy.log(self.xy)
         self.y = numpy.exp(lnxy - Delta) / self.x[::-1]
 
         self._x_ = self._pad(self.x, 0, True, False)
