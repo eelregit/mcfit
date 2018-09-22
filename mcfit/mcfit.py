@@ -176,10 +176,10 @@ class mcfit(object):
             input function
         axis : int, optional
             axis along which to integrate
-        extrap : bool or 2-tuple of bools, optional
+        extrap : bool or sequence of 2 bools, optional
             whether to extrapolate `F` with power laws or to pad it with zeros,
-            to size `N`, before convolution; for a tuple, the two elements are
-            for the left and right pads
+            to size `N`, before convolution; for a pair of bools, the two items
+            are for the left and right pads
         keeppads : bool, optional
             whether to keep the padding in the output
         convonly : bool, optional
@@ -299,10 +299,9 @@ class mcfit(object):
             array to be padded to size `N`
         axis : int
             axis along which to pad
-        extrap : bool or 2-tuple of bools
-            whether to extrapolate `a` with power laws or to just pad with
-            zeros; for a tuple, the two elements are for the left and right
-            pads
+        extrap : bool or sequence of 2 bools
+            whether to extrapolate `a` with power laws or to pad it with zeros;
+            for a pair of bools, the two items are for the left and right pads
         out : bool
             pad the output if True, otherwise the input; the two cases have
             their left and right pad sizes reversed
@@ -315,7 +314,10 @@ class mcfit(object):
         to_axis = [1] * a.ndim
         to_axis[axis] = -1
 
-        _extrap, extrap_ = (extrap, extrap) if numpy.isscalar(extrap) else extrap
+        if isinstance(extrap, bool):
+            _extrap = extrap_ = extrap
+        else:
+            _extrap, extrap_ = extrap[0], extrap[1]
 
         Npad = self.N - self.Nin
         if out:
