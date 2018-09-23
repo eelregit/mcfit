@@ -29,10 +29,10 @@ class mcfit(object):
     q : float
         power-law tilt, can be used to balance :math:`f` at large and small
         :math:`x`. Avoid the singularities in `UK`
-    N : int, optional
-        size of FFT, defaults to the smallest power of 2 that at least doubles
-        the size of `x`; the input function is padded symmetrically to this
-        size with extrapolations or zeros before convolution
+    N : int or complex, optional
+        size of convolution, if complex then replaced by the smallest power of
+        2 that is at least `N.imag` times the size of `x`; the input function
+        is padded symmetrically to this size before convolution
     lowring : bool, optional
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
@@ -48,6 +48,8 @@ class mcfit(object):
     ----------
     Nin : int
         input (and output) size
+    N : int
+        convolution size
     x : (Nin,) ndarray
         input argument
     y : (Nin,) ndarray
@@ -104,7 +106,7 @@ class mcfit(object):
             MNRAS, 312:257-284, February 2000.
     """
 
-    def __init__(self, x, UK, q, N=None, lowring=True, xy=1):
+    def __init__(self, x, UK, q, N=2j, lowring=True, xy=1):
         self.x = numpy.asarray(x)
         self.Nin = len(x)
         self.UK = UK
@@ -141,16 +143,16 @@ class mcfit(object):
 
     def _setup(self):
         if self.Nin < 2:
-            raise ValueError("input size too short")
+            raise ValueError("input size too small")
         Delta = numpy.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
         if not numpy.allclose(self.x[1:] / self.x[:-1], numpy.exp(Delta), rtol=1e-3):
             raise ValueError("input not log-evenly spaced")
 
-        if self.N is None:
-            folds = int(numpy.ceil(numpy.log2(self.Nin))) + 1
+        if isinstance(self.N, complex):
+            folds = int(numpy.ceil(numpy.log2(self.Nin * self.N.imag)))
             self.N = 2**folds
         if self.N < self.Nin:
-            raise ValueError("FFT size shorter than input size")
+            raise ValueError("convolution size smaller than input size")
 
         if self.lowring and self.N % 2 == 0:
             lnxy = Delta / numpy.pi * numpy.angle(self.UK(self.q + 1j * numpy.pi / Delta))
