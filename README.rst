@@ -19,7 +19,7 @@ the input function and the kernel.
 The idea is to take advantage of the convolution theorem in :math:`\ln x` and
 :math:`\ln y`.
 It approximates the input function with truncated Fourier series over one
-period of the periodic approximant, and use the exact Fourier transform of the
+period of a periodic approximant, and use the exact Fourier transform of the
 kernel.
 One can calculate the latter analytically as a Mellin transform.
 This algorithm is optimal when the input function is smooth in :math:`\ln x`,
