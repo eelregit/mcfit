@@ -19,7 +19,7 @@ class P2xi(mcfit):
         self.l = l
         UK = kernels.Mellin_SphericalBesselJ(l)
         mcfit.__init__(self, k, UK, q, **kwargs)
-        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1) # i^l
+        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
         self.prefac *= phase / (2*numpy.pi)**1.5 * self.x**3
 
 
@@ -32,7 +32,7 @@ class xi2P(mcfit):
         UK = kernels.Mellin_SphericalBesselJ(l)
         mcfit.__init__(self, r, UK, q, **kwargs)
         self.prefac *= self.x**3
-        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1) # i^l
+        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
         self.postfac *= (2*numpy.pi)**1.5 / phase
 
 

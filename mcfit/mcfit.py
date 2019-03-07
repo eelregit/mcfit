@@ -215,9 +215,9 @@ class mcfit(object):
             f = self._xfac_.reshape(to_axis) * f
 
         # convolution
-        f = numpy.fft.rfft(f, axis=axis) # f(x_n) -> f_m
-        g = f * self._u.reshape(to_axis) # f_m -> g_m
-        g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N # g_m -> g(y_n)
+        f = numpy.fft.rfft(f, axis=axis)  # f(x_n) -> f_m
+        g = f * self._u.reshape(to_axis)  # f_m -> g_m
+        g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N  # g_m -> g(y_n)
 
         if not keeppads:
             G = self._unpad(g, axis, True)
@@ -278,7 +278,7 @@ class mcfit(object):
 
         v = numpy.fft.hfft(self._u, n=self.N) / self.N
         idx = sum(numpy.ogrid[0:self.N, -self.N:0])
-        C = v[idx] # follow scipy.linalg.{circulant,toeplitz,hankel}
+        C = v[idx]  # follow scipy.linalg.{circulant,toeplitz,hankel}
 
         if keeppads:
             a = self._yfac_.copy()
@@ -315,7 +315,7 @@ class mcfit(object):
 
         assert a.shape[axis] == self.Nin
 
-        axis %= a.ndim # to fix the indexing below with axis+1
+        axis %= a.ndim  # to fix the indexing below with axis+1
 
         to_axis = [1] * a.ndim
         to_axis[axis] = -1
