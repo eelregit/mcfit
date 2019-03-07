@@ -173,7 +173,7 @@ class mcfit(object):
         #    self._u[self.N//2] = self._u[self.N//2].real
 
 
-    def __call__(self, F, axis=-1, extrap=True, keeppads=False, convonly=False):
+    def __call__(self, F, axis=-1, extrap=False, keeppads=False, convonly=False):
         """Evaluate the integral.
 
         Parameters
