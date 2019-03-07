@@ -106,7 +106,7 @@ class mcfit(object):
             MNRAS, 312:257-284, February 2000.
     """
 
-    def __init__(self, x, UK, q, N=2j, lowring=True, xy=1):
+    def __init__(self, x, UK, q, N=2j, lowring=False, xy=1):
         self.x = numpy.asarray(x)
         self.Nin = len(x)
         self.UK = UK
