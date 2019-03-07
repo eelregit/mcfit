@@ -231,6 +231,21 @@ class mcfit(object):
             return self._y_, _G_
 
 
+    def inv(self):
+        """Invert the transform.
+
+        After calling this method, calling the instance will do the inverse
+        transform. Calling this twice return the instance to the original
+        transform.
+        """
+
+        self.x, self.y = self.y, self.x
+        self._x_, self._y_ = self._y_, self._x_
+        self.xfac, self.yfac = 1 / self.yfac, 1 / self.xfac
+        self._xfac_, self._yfac_ = 1 / self._yfac_, 1 / self._xfac_
+        self._u = 1 / self._u.conj()
+
+
     def matrix(self, full=False, keeppads=True):
         """Return matrix form of the integral transform.
 
