@@ -25,7 +25,7 @@ class mcfit(object):
         log-evenly spaced input argument
     UK : callable
         Mellin transform of the kernel
-        .. math:: U_K(z) \equiv \int_0^\infty t^z K(t) dt
+        .. math:: U_K(z) \equiv \int_0^\infty t^{z-1} K(t) dt
     q : float
         power-law tilt, can be used to balance :math:`f` at large and small
         :math:`x`. Avoid the singularities in `UK`
