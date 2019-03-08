@@ -4,4 +4,4 @@ from .mcfit import mcfit
 from .transforms import *
 from .cosmology import *
 
-__version__ = "0.0.13"
+__version__ = "0.0.14"
