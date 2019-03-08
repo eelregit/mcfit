@@ -9,12 +9,12 @@ def test_Hankel():
     x = numpy.logspace(-3, 3, num=60, endpoint=False)
     F = F_fun(x)
     H = Hankel(x, nu=0, q=1, N=128, lowring=True)
-    y, G = H(F)
+    y, G = H(F, extrap=True)
     assert_allclose(G, G_fun(y), rtol=1e-8, atol=1e-8)
 
     # NOTE the range for best accuracy does not exactly "match"
     y = numpy.logspace(-4, 2, num=60, endpoint=False)
     G = G_fun(y)
     H_inv = Hankel(y, nu=0, q=1, N=128, lowring=True)
-    x, F = H_inv(G)
+    x, F = H_inv(G, extrap=True)
     assert_allclose(F, F_fun(x), rtol=1e-10, atol=1e-10)
