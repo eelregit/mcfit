@@ -1,6 +1,22 @@
 Multiplicatively Convolutional Fast Integral Transforms
 =======================================================
 
+
+Features
+--------
+
+* Compute integral transforms
+* Given a transform, compute it inverse
+* Transform input array along any axis
+* Output the matrix form
+* 1-to-n transform for multiple kernels (TODO)
+* Kernel as its derivatives (TODO)
+* Easily extensible for other kernels
+
+
+Algorithm
+---------
+
 `mcfit` computes integral transforms of the form
 
 .. math:: G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x
