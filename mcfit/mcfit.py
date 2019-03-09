@@ -22,7 +22,7 @@ class mcfit(object):
     Parameters
     ----------
     x : (Nin,) array_like
-        log-evenly spaced input argument
+        logarithmically spaced input argument
     UK : callable
         Mellin transform of the kernel
         .. math:: U_K(z) \equiv \int_0^\infty t^{z-1} K(t) dt
@@ -146,7 +146,7 @@ class mcfit(object):
             raise ValueError("input size too small")
         Delta = numpy.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
         if not numpy.allclose(self.x[1:] / self.x[:-1], numpy.exp(Delta), rtol=1e-3):
-            raise ValueError("input not log-evenly spaced")
+            raise ValueError("input not logarithmically spaced")
 
         if isinstance(self.N, complex):
             folds = int(numpy.ceil(numpy.log2(self.Nin * self.N.imag)))
@@ -195,7 +195,7 @@ class mcfit(object):
         Returns
         -------
         y : (Nin,) or (N,) ndarray
-            log-evenly spaced output argument
+            logarithmically spaced output argument
         G : (..., Nin, ...) or (..., N, ...) ndarray
             output function
 
