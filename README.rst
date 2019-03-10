@@ -6,11 +6,11 @@ Features
 --------
 
 * Compute integral transforms
-* Given a transform, compute it inverse
+* inverse transform without analytic inversion
 * Transform input array along any axis
 * Output the matrix form
 * 1-to-n transform for multiple kernels (TODO)
-* Kernel as its derivatives (TODO)
+* Kernel as derivatives (TODO)
 * Easily extensible for other kernels
 
 
