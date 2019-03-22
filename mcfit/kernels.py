@@ -7,8 +7,14 @@ except ImportError:
         return log(gamma(x))
 
 def _deriv(UK, deriv):
+    """Real deriv is to :math:`t`, complex deriv is to :math:`\ln t`"""
     if deriv == 0:
         return UK
+
+    if isinstance(deriv, complex):
+        def UKderiv(z):
+            return (-z) ** deriv.imag * UK(z)
+        return UKderiv
 
     def UKderiv(z):
         poly = arange(deriv) + 1
