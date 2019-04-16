@@ -32,7 +32,8 @@ class mcfit(object):
     N : int or complex, optional
         size of convolution, if complex then replaced by the smallest power of
         2 that is at least `N.imag` times the size of `x`; the input function
-        is padded symmetrically to this size before convolution
+        is padded symmetrically to this size before convolution (see the
+        `extrap` argument for available options)
     lowring : bool, optional
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
@@ -182,10 +183,14 @@ class mcfit(object):
             input function
         axis : int, optional
             axis along which to integrate
-        extrap : bool or sequence of 2 bools, optional
-            whether to extrapolate `F` with power laws or to pad it with zeros,
-            to size `N`, before convolution; for a pair of bools, the two items
-            are for the left and right pads
+        extrap : {bool, 'const'} or 2-tuple, optional
+            Method to extrapolate `F`.
+            For a 2-tuple, the two elements are for the left and right pads,
+            whereas a single value applies to both ends.
+            Options are:
+            * True: power-law extrapolation using the end segment
+            * False: zero padding
+            * 'const': constant padding with the end point value
         keeppads : bool, optional
             whether to keep the padding in the output
         convonly : bool, optional
@@ -312,7 +317,7 @@ class mcfit(object):
 
 
     def _pad(self, a, axis, extrap, out):
-        """Pad an array with power-law extrapolations or zeros.
+        """Add padding to an array.
 
         Parameters
         ----------
@@ -320,9 +325,14 @@ class mcfit(object):
             array to be padded to size `N`
         axis : int
             axis along which to pad
-        extrap : bool or sequence of 2 bools
-            whether to extrapolate `a` with power laws or to pad it with zeros;
-            for a pair of bools, the two items are for the left and right pads
+        extrap : {bool, 'const'} or 2-tuple
+            Method to extrapolate `a`.
+            For a 2-tuple, the two elements are for the left and right pads,
+            whereas a single value applies to both ends.
+            Options are:
+            * True: power-law extrapolation using the end segment
+            * False: zero padding
+            * 'const': constant padding with the end point value
         out : bool
             pad the output if True, otherwise the input; the two cases have
             their left and right pad sizes reversed
@@ -335,30 +345,43 @@ class mcfit(object):
         to_axis = [1] * a.ndim
         to_axis[axis] = -1
 
-        if isinstance(extrap, bool):
-            _extrap = extrap_ = extrap
-        else:
-            _extrap, extrap_ = extrap[0], extrap[1]
-
         Npad = self.N - self.Nin
         if out:
             _Npad, Npad_ = Npad - Npad//2, Npad//2
         else:
             _Npad, Npad_ = Npad//2, Npad - Npad//2
-        if _extrap:
-            start = numpy.take(a, [0], axis=axis)
-            ratio = numpy.take(a, [1], axis=axis) / start
-            exp = numpy.arange(-_Npad, 0).reshape(to_axis)
-            _a = start * ratio ** exp
+
+        try:
+            _extrap, extrap_ = extrap
+        except (TypeError, ValueError):
+            _extrap = extrap_ = extrap
+
+        if isinstance(_extrap, bool):
+            if _extrap:
+                end = numpy.take(a, [0], axis=axis)
+                ratio = numpy.take(a, [1], axis=axis) / end
+                exp = numpy.arange(-_Npad, 0).reshape(to_axis)
+                _a = end * ratio ** exp
+            else:
+                _a = numpy.zeros(a.shape[:axis] + (_Npad,) + a.shape[axis+1:])
+        elif _extrap == 'const':
+            end = numpy.take(a, [0], axis=axis)
+            _a = numpy.repeat(end, _Npad, axis=axis)
         else:
-            _a = numpy.zeros(a.shape[:axis] + (_Npad,) + a.shape[axis+1:])
-        if extrap_:
-            start = numpy.take(a, [-1], axis=axis)
-            ratio = start / numpy.take(a, [-2], axis=axis)
-            exp = numpy.arange(1, Npad_ + 1).reshape(to_axis)
-            a_ = start * ratio ** exp
+            raise ValueError("left extrap not supported")
+        if isinstance(extrap_, bool):
+            if extrap_:
+                end = numpy.take(a, [-1], axis=axis)
+                ratio = end / numpy.take(a, [-2], axis=axis)
+                exp = numpy.arange(1, Npad_ + 1).reshape(to_axis)
+                a_ = end * ratio ** exp
+            else:
+                a_ = numpy.zeros(a.shape[:axis] + (Npad_,) + a.shape[axis+1:])
+        elif extrap_ == 'const':
+            end = numpy.take(a, [-1], axis=axis)
+            a_ = numpy.repeat(end, Npad_, axis=axis)
         else:
-            a_ = numpy.zeros(a.shape[:axis] + (Npad_,) + a.shape[axis+1:])
+            raise ValueError("right extrap not supported")
 
         return numpy.concatenate((_a, a, a_), axis=axis)
 
