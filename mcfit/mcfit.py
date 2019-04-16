@@ -1,5 +1,6 @@
 from __future__ import division
 import numpy as np
+import warnings
 
 
 class mcfit(object):
@@ -120,6 +121,10 @@ class mcfit(object):
         self.prefac = 1
         self.postfac = 1
 
+        if lowring == False:
+            warnings.warn("The default value of lowring has been changed to False, "
+                "set it to True if you cannot reproduce previous results")
+
 
     @property
     def prefac(self):
@@ -209,6 +214,10 @@ class mcfit(object):
         `y`, and `G` are unpadded by default. Pads can be kept if `keeppads` is
         set to True.
         """
+
+        if extrap == False:
+            warnings.warn("The default value of extrap has been changed to False, "
+                "set it to True if you cannot reproduce previous results")
 
         F = np.asarray(F)
 
@@ -426,7 +435,6 @@ class mcfit(object):
         fabs_m = fabs[iQ1:iQ3].mean()
         fabs_r = fabs[iQ3:].mean()
 
-        import warnings
         if fabs_l > fabs_m:
             warnings.warn("left wing seems heavy: {:.2g} vs {:.2g}, "
                     "change tilt and mind convergence".format(fabs_l, fabs_m), RuntimeWarning)
