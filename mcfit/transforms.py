@@ -7,7 +7,7 @@ Common Integral transforms and applications
 from __future__ import division
 from .mcfit import mcfit
 from . import kernels
-import numpy
+from numpy import pi
 from scipy.special import gamma
 
 
@@ -128,7 +128,7 @@ class TophatSmooth(mcfit):
         self.dim = dim
         UK = kernels.Mellin_Tophat(dim, deriv)
         mcfit.__init__(self, x, UK, q, **kwargs)
-        self.prefac *= self.x**dim / (2**(dim-1) * numpy.pi**(dim/2) * gamma(dim/2))
+        self.prefac *= self.x**dim / (2**(dim-1) * pi**(dim/2) * gamma(dim/2))
 
 
 class GaussSmooth(mcfit):
@@ -138,4 +138,4 @@ class GaussSmooth(mcfit):
         self.dim = dim
         UK = kernels.Mellin_Gauss(deriv)
         mcfit.__init__(self, x, UK, q, **kwargs)
-        self.prefac *= self.x**dim / (2**(dim-1) * numpy.pi**(dim/2) * gamma(dim/2))
+        self.prefac *= self.x**dim / (2**(dim-1) * pi**(dim/2) * gamma(dim/2))

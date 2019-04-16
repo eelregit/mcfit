@@ -6,7 +6,7 @@ Cosmology applications
 
 from .mcfit import mcfit
 from . import kernels
-import numpy
+from numpy import pi
 
 
 __all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar', 'ExcursionSet']
@@ -20,7 +20,7 @@ class P2xi(mcfit):
         UK = kernels.Mellin_SphericalBesselJ(l, deriv)
         mcfit.__init__(self, k, UK, q, **kwargs)
         phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
-        self.prefac *= phase / (2*numpy.pi)**1.5 * self.x**3
+        self.prefac *= phase / (2*pi)**1.5 * self.x**3
 
 
 class xi2P(mcfit):
@@ -33,7 +33,7 @@ class xi2P(mcfit):
         mcfit.__init__(self, r, UK, q, **kwargs)
         self.prefac *= self.x**3
         phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
-        self.postfac *= (2*numpy.pi)**1.5 / phase
+        self.postfac *= (2*pi)**1.5 / phase
 
 
 class TophatVar(mcfit):
@@ -51,7 +51,7 @@ class TophatVar(mcfit):
     def __init__(self, k, deriv=0, q=1.5, **kwargs):
         UK = kernels.Mellin_TophatSq(3, deriv)
         mcfit.__init__(self, k, UK, q, **kwargs)
-        self.prefac *= self.x**3 / (2 * numpy.pi**2)
+        self.prefac *= self.x**3 / (2 * pi**2)
 
 
 class GaussVar(mcfit):
@@ -60,7 +60,7 @@ class GaussVar(mcfit):
     def __init__(self, k, deriv=0, q=1.5, **kwargs):
         UK = kernels.Mellin_GaussSq(deriv)
         mcfit.__init__(self, k, UK, q, **kwargs)
-        self.prefac *= self.x**3 / (2 * numpy.pi**2)
+        self.prefac *= self.x**3 / (2 * pi**2)
 
 
 class ExcursionSet(mcfit):

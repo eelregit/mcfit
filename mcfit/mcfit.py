@@ -1,5 +1,5 @@
 from __future__ import division
-import numpy
+import numpy as np
 
 
 class mcfit(object):
@@ -108,7 +108,7 @@ class mcfit(object):
     """
 
     def __init__(self, x, UK, q, N=2j, lowring=False, xy=1):
-        self.x = numpy.asarray(x)
+        self.x = np.asarray(x)
         self.Nin = len(x)
         self.UK = UK
         self.q = q
@@ -145,29 +145,29 @@ class mcfit(object):
     def _setup(self):
         if self.Nin < 2:
             raise ValueError("input size too small")
-        Delta = numpy.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
-        if not numpy.allclose(self.x[1:] / self.x[:-1], numpy.exp(Delta), rtol=1e-3):
+        Delta = np.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
+        if not np.allclose(self.x[1:] / self.x[:-1], np.exp(Delta), rtol=1e-3):
             raise ValueError("input not logarithmically spaced")
 
         if isinstance(self.N, complex):
-            folds = int(numpy.ceil(numpy.log2(self.Nin * self.N.imag)))
+            folds = int(np.ceil(np.log2(self.Nin * self.N.imag)))
             self.N = 2**folds
         if self.N < self.Nin:
             raise ValueError("convolution size smaller than input size")
 
         if self.lowring and self.N % 2 == 0:
-            lnxy = Delta / numpy.pi * numpy.angle(self.UK(self.q + 1j * numpy.pi / Delta))
-            self.xy = numpy.exp(lnxy)
+            lnxy = Delta / np.pi * np.angle(self.UK(self.q + 1j * np.pi / Delta))
+            self.xy = np.exp(lnxy)
         else:
-            lnxy = numpy.log(self.xy)
-        self.y = numpy.exp(lnxy - Delta) / self.x[::-1]
+            lnxy = np.log(self.xy)
+        self.y = np.exp(lnxy - Delta) / self.x[::-1]
 
         self._x_ = self._pad(self.x, 0, True, False)
         self._y_ = self._pad(self.y, 0, True, True)
 
-        m = numpy.arange(0, self.N//2 + 1)
-        self._u = self.UK(self.q + 2j * numpy.pi / self.N / Delta * m)
-        self._u *= numpy.exp(-2j * numpy.pi * lnxy / self.N / Delta * m)
+        m = np.arange(0, self.N//2 + 1)
+        self._u = self.UK(self.q + 2j * np.pi / self.N / Delta * m)
+        self._u *= np.exp(-2j * np.pi * lnxy / self.N / Delta * m)
 
         # following is unnecessary because hfft ignores the imag at Nyquist anyway
         #if not self.lowring and self.N % 2 == 0:
@@ -210,7 +210,7 @@ class mcfit(object):
         set to True.
         """
 
-        F = numpy.asarray(F)
+        F = np.asarray(F)
 
         to_axis = [1] * F.ndim
         to_axis[axis] = -1
@@ -220,9 +220,9 @@ class mcfit(object):
             f = self._xfac_.reshape(to_axis) * f
 
         # convolution
-        f = numpy.fft.rfft(f, axis=axis)  # f(x_n) -> f_m
+        f = np.fft.rfft(f, axis=axis)  # f(x_n) -> f_m
         g = f * self._u.reshape(to_axis)  # f_m -> g_m
-        g = numpy.fft.hfft(g, n=self.N, axis=axis) / self.N  # g_m -> g(y_n)
+        g = np.fft.hfft(g, n=self.N, axis=axis) / self.N  # g_m -> g(y_n)
 
         if not keeppads:
             G = self._unpad(g, axis, True)
@@ -296,8 +296,8 @@ class mcfit(object):
         matrix.
         """
 
-        v = numpy.fft.hfft(self._u, n=self.N) / self.N
-        idx = sum(numpy.ogrid[0:self.N, -self.N:0])
+        v = np.fft.hfft(self._u, n=self.N) / self.N
+        idx = sum(np.ogrid[0:self.N, -self.N:0])
         C = v[idx]  # follow scipy.linalg.{circulant,toeplitz,hankel}
 
         if keeppads:
@@ -358,32 +358,32 @@ class mcfit(object):
 
         if isinstance(_extrap, bool):
             if _extrap:
-                end = numpy.take(a, [0], axis=axis)
-                ratio = numpy.take(a, [1], axis=axis) / end
-                exp = numpy.arange(-_Npad, 0).reshape(to_axis)
+                end = np.take(a, [0], axis=axis)
+                ratio = np.take(a, [1], axis=axis) / end
+                exp = np.arange(-_Npad, 0).reshape(to_axis)
                 _a = end * ratio ** exp
             else:
-                _a = numpy.zeros(a.shape[:axis] + (_Npad,) + a.shape[axis+1:])
+                _a = np.zeros(a.shape[:axis] + (_Npad,) + a.shape[axis+1:])
         elif _extrap == 'const':
-            end = numpy.take(a, [0], axis=axis)
-            _a = numpy.repeat(end, _Npad, axis=axis)
+            end = np.take(a, [0], axis=axis)
+            _a = np.repeat(end, _Npad, axis=axis)
         else:
             raise ValueError("left extrap not supported")
         if isinstance(extrap_, bool):
             if extrap_:
-                end = numpy.take(a, [-1], axis=axis)
-                ratio = end / numpy.take(a, [-2], axis=axis)
-                exp = numpy.arange(1, Npad_ + 1).reshape(to_axis)
+                end = np.take(a, [-1], axis=axis)
+                ratio = end / np.take(a, [-2], axis=axis)
+                exp = np.arange(1, Npad_ + 1).reshape(to_axis)
                 a_ = end * ratio ** exp
             else:
-                a_ = numpy.zeros(a.shape[:axis] + (Npad_,) + a.shape[axis+1:])
+                a_ = np.zeros(a.shape[:axis] + (Npad_,) + a.shape[axis+1:])
         elif extrap_ == 'const':
-            end = numpy.take(a, [-1], axis=axis)
-            a_ = numpy.repeat(end, Npad_, axis=axis)
+            end = np.take(a, [-1], axis=axis)
+            a_ = np.repeat(end, Npad_, axis=axis)
         else:
             raise ValueError("right extrap not supported")
 
-        return numpy.concatenate((_a, a, a_), axis=axis)
+        return np.concatenate((_a, a, a_), axis=axis)
 
 
     def _unpad(self, a, axis, out):
@@ -408,7 +408,7 @@ class mcfit(object):
         else:
             _Npad, Npad_ = Npad//2, Npad - Npad//2
 
-        return numpy.take(a, range(_Npad, self.N - Npad_), axis=axis)
+        return np.take(a, range(_Npad, self.N - Npad_), axis=axis)
 
 
     def check(self, F):
@@ -418,9 +418,9 @@ class mcfit(object):
         assert F.ndim == 1, "checker only supports 1D"
 
         f = self.xfac * F
-        fabs = numpy.abs(f)
+        fabs = np.abs(f)
 
-        iQ1, iQ3 = numpy.searchsorted(fabs.cumsum(), numpy.array([0.25, 0.75]) * fabs.sum())
+        iQ1, iQ3 = np.searchsorted(fabs.cumsum(), np.array([0.25, 0.75]) * fabs.sum())
         assert 0 != iQ1 != iQ3 != self.Nin, "checker giving up"
         fabs_l = fabs[:iQ1].mean()
         fabs_m = fabs[iQ1:iQ3].mean()
