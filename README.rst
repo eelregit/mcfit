@@ -64,14 +64,14 @@ easily as follows
 
     x = numpy.logspace(-3, 3, num=60, endpoint=False)
     F = F_fun(x)
-    H = Hankel(x)
-    y, G = H(F)
+    H = Hankel(x, lowring=True)
+    y, G = H(F, extrap=True)
     numpy.allclose(G, G_fun(y), rtol=1e-8, atol=1e-8)
 
     y = numpy.logspace(-4, 2, num=60, endpoint=False)
     G = G_fun(y)
-    H_inv = Hankel(y)
-    x, F = H_inv(G)
+    H_inv = Hankel(y, lowring=True)
+    x, F = H_inv(G, extrap=True)
     numpy.allclose(F, F_fun(x), rtol=1e-10, atol=1e-10)
 
 Cosmologists often need to transform a power spectrum to its correlation
@@ -104,7 +104,8 @@ be interpolated.
 
 .. code-block:: python
 
-    R, var = TophatVar(k)(P)
+    from mcfit import TophatVar
+    R, var = TophatVar(k, lowring=True)(P, extrap=True)
     from scipy.interpolate import CubicSpline
     varR = CubicSpline(R, var)
     sigma8 = numpy.sqrt(varR(8))

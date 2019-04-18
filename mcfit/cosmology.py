@@ -41,9 +41,8 @@ class TophatVar(mcfit):
 
     Examples
     --------
-    To compute :math:`\sigma_8` of a linear power spectrum :math:`P(k)`, with
-    :math:`P` in unit of :math:`[k]^{-3}`
-    >>> R, var = TophatVar(k)(P)
+    To compute :math:`\sigma_8` of a linear power spectrum :math:`P(k)`
+    >>> R, var = TophatVar(k, lowring=True)(P, extrap=True)
     >>> from scipy.interpolate import CubicSpline
     >>> varR = CubicSpline(R, var)
     >>> sigma8 = numpy.sqrt(varR(8))

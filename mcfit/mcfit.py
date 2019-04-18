@@ -89,12 +89,12 @@ class mcfit(object):
     --------
     >>> x = numpy.logspace(-3, 3, num=60, endpoint=False)
     >>> A = 1 / (1 + x*x)**1.5
-    >>> H = mcfit.mcfit(x, mcfit.kernels.Mellin_BesselJ(0), q=1)
-    >>> y, B = H(x**2 * A)
+    >>> H = mcfit.mcfit(x, mcfit.kernels.Mellin_BesselJ(0), q=1, lowring=True)
+    >>> y, B = H(x**2 * A, extrap=True)
     >>> numpy.allclose(B, numpy.exp(-y))
 
     More conveniently, use the Hankel transform subclass
-    >>> y, B = mcfit.transforms.Hankel(x)(A)
+    >>> y, B = mcfit.transforms.Hankel(x, lowring=True)(A, extrap=True)
 
     Notes
     -----
