@@ -23,22 +23,22 @@ def _deriv(UK, deriv):
         return poly * UK(z - deriv)
     return UKderiv
 
-def Mellin_BesselJ(nu, deriv):
+def Mellin_BesselJ(nu, deriv=0):
     def UK(z):
         return exp(log(2)*(z-1) + loggamma(0.5*(nu+z)) - loggamma(0.5*(2+nu-z)))
     return _deriv(UK, deriv)
 
-def Mellin_SphericalBesselJ(nu, deriv):
+def Mellin_SphericalBesselJ(nu, deriv=0):
     def UK(z):
         return exp(log(2)*(z-1.5) + loggamma(0.5*(nu+z)) - loggamma(0.5*(3+nu-z)))
     return _deriv(UK, deriv)
 
-def Mellin_FourierSine(deriv):
+def Mellin_FourierSine(deriv=0):
     def UK(z):
         return exp(log(2)*(z-0.5) + loggamma(0.5*(1+z)) - loggamma(0.5*(2-z)))
     return _deriv(UK, deriv)
 
-def Mellin_FourierCosine(deriv):
+def Mellin_FourierCosine(deriv=0):
     def UK(z):
         return exp(log(2)*(z-0.5) + loggamma(0.5*z) - loggamma(0.5*(1-z)))
     return _deriv(UK, deriv)
@@ -89,13 +89,13 @@ def Mellin_DoubleSphericalBesselJ(alpha, nu1, nu2):
         raise ValueError
     return UK
 
-def Mellin_Tophat(dim, deriv):
+def Mellin_Tophat(dim, deriv=0):
     def UK(z):
         return exp(log(2)*(z-1) + loggamma(1+0.5*dim) + loggamma(0.5*z) \
                 - loggamma(0.5*(2+dim-z)))
     return _deriv(UK, deriv)
 
-def Mellin_TophatSq(dim, deriv):
+def Mellin_TophatSq(dim, deriv=0):
     if dim == 1:
         def UK(z):
             return -0.25*sqrt(pi) * exp(loggamma(0.5*(z-2)) - loggamma(0.5*(3-z)))
@@ -110,12 +110,12 @@ def Mellin_TophatSq(dim, deriv):
                     - loggamma(1+dim-0.5*z) - loggamma(0.5*(2+dim-z))) / sqrt(pi)
     return _deriv(UK, deriv)
 
-def Mellin_Gauss(deriv):
+def Mellin_Gauss(deriv=0):
     def UK(z):
         return 2**(0.5*z-1) * gamma(0.5*z)
     return _deriv(UK, deriv)
 
-def Mellin_GaussSq(deriv):
+def Mellin_GaussSq(deriv=0):
     def UK(z):
         return 0.5 * gamma(0.5*z)
     return _deriv(UK, deriv)
