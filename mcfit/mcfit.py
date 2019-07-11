@@ -151,14 +151,14 @@ class mcfit(object):
         if self.Nin < 2:
             raise ValueError("input size too small")
         Delta = np.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
-        if not np.allclose(self.x[1:] / self.x[:-1], np.exp(Delta), rtol=1e-3):
-            raise ValueError("input not logarithmically spaced")
+        if not np.allclose(np.log(self.x[1:10] / self.x[-10:-1]), Delta, rtol=1e-3):
+            warnings.warn("input must be logarithmically spaced")
 
         if isinstance(self.N, complex):
             folds = int(np.ceil(np.log2(self.Nin * self.N.imag)))
             self.N = 2**folds
         if self.N < self.Nin:
-            raise ValueError("convolution size smaller than input size")
+            raise ValueError("convolution size must be larger than input size")
 
         if self.lowring and self.N % 2 == 0:
             lnxy = Delta / np.pi * np.angle(self.UK(self.q + 1j * np.pi / Delta))
@@ -211,8 +211,7 @@ class mcfit(object):
 
         Notes
         -----
-        `y`, and `G` are unpadded by default. Pads can be kept if `keeppads` is
-        set to True.
+        `y`, and `G` are unpadded by default.
         """
 
         if extrap == False:
@@ -287,8 +286,7 @@ class mcfit(object):
 
         Notes
         -----
-        `M`, `a`, `b`, and `C` are padded by default. Pads can be discarded if
-        `keeppads` is set to False.
+        `M`, `a`, `b`, and `C` are padded by default.
 
         This is not meant for evaluation with matrix multiplication but in case
         one is interested in the tranformation itself.
