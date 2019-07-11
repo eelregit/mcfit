@@ -184,8 +184,8 @@ class mcfit(object):
 
         Parameters
         ----------
-        F : (..., Nin, ...) array_like
-            input function
+        F : (..., Nin, ...) or (..., N, ...) array_like
+            input function; skip padding if already of size `N`
         axis : int, optional
             axis along which to integrate
         extrap : {bool, 'const'} or 2-tuple, optional
@@ -208,10 +208,6 @@ class mcfit(object):
             logarithmically spaced output argument
         G : (..., Nin, ...) or (..., N, ...) ndarray
             output function
-
-        Notes
-        -----
-        `y`, and `G` are unpadded by default.
         """
 
         if extrap == False:
@@ -328,8 +324,8 @@ class mcfit(object):
 
         Parameters
         ----------
-        a : (..., Nin, ...) ndarray
-            array to be padded to size `N`
+        a : (..., Nin, ...) or (..., N, ...) ndarray
+            array to be padded; skip padding if already of size `N`
         axis : int
             axis along which to pad
         extrap : {bool, 'const'} or 2-tuple
@@ -345,7 +341,10 @@ class mcfit(object):
             their left and right pad sizes reversed
         """
 
-        assert a.shape[axis] == self.Nin
+        if a.shape[axis] == self.N:
+            return a
+        elif a.shape[axis] != self.Nin:
+            raise ValueError("array much be of size len(x) or N")
 
         axis %= a.ndim  # to fix the indexing below with axis+1
 
@@ -398,16 +397,19 @@ class mcfit(object):
 
         Parameters
         ----------
-        a : (..., N, ...) ndarray
-            array to be trimmed to size `Nin`
+        a : (..., N, ...) or (..., Nin, ...) ndarray
+            array to be unpadded; skip unpadding if already of size `Nin`
         axis : int
             axis along which to unpad
         out : bool
-            trim the output if True, otherwise the input; the two cases have
+            unpad the output if True, otherwise the input; the two cases have
             their left and right pad sizes reversed
         """
 
-        assert a.shape[axis] == self.N
+        if a.shape[axis] == self.Nin:
+            return a
+        elif a.shape[axis] != self.N:
+            raise ValueError("array much be of size N or len(x)")
 
         Npad = self.N - self.Nin
         if out:
