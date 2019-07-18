@@ -151,7 +151,8 @@ class mcfit(object):
         if self.Nin < 2:
             raise ValueError("input size too small")
         Delta = np.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
-        if not np.allclose(np.log(self.x[1:10] / self.x[-10:-1]), Delta, rtol=1e-3):
+        x_head = self.x[:10]
+        if not np.allclose(np.log(x_head[1:] / x_head[:-1]), Delta, rtol=1e-3):
             warnings.warn("input must be logarithmically spaced")
 
         if isinstance(self.N, complex):
