@@ -24,12 +24,12 @@ class mcfit(object):
     ----------
     x : (Nin,) array_like
         logarithmically spaced input argument
-    UK : callable
+    MK : callable
         Mellin transform of the kernel
         .. math:: U_K(z) \equiv \int_0^\infty t^{z-1} K(t) dt
     q : float
         power-law tilt, can be used to balance :math:`f` at large and small
-        :math:`x`. Avoid the singularities in `UK`
+        :math:`x`. Avoid the singularities in `MK`
     N : int or complex, optional
         size of convolution, if complex then replaced by the smallest power of
         2 that is at least `N.imag` times the size of `x`; the input function
@@ -108,10 +108,10 @@ class mcfit(object):
             MNRAS, 312:257-284, February 2000.
     """
 
-    def __init__(self, x, UK, q, N=2j, lowring=False, xy=1):
+    def __init__(self, x, MK, q, N=2j, lowring=False, xy=1):
         self.x = np.asarray(x)
         self.Nin = len(x)
-        self.UK = UK
+        self.MK = MK
         self.q = q
         self.N = N
         self.lowring = lowring
@@ -161,7 +161,7 @@ class mcfit(object):
             raise ValueError("convolution size must be larger than input size")
 
         if self.lowring and self.N % 2 == 0:
-            lnxy = Delta / np.pi * np.angle(self.UK(self.q + 1j * np.pi / Delta))
+            lnxy = Delta / np.pi * np.angle(self.MK(self.q + 1j * np.pi / Delta))
             self.xy = np.exp(lnxy)
         else:
             lnxy = np.log(self.xy)
@@ -171,7 +171,7 @@ class mcfit(object):
         self._y_ = self._pad(self.y, 0, True, True)
 
         m = np.arange(0, self.N//2 + 1)
-        self._u = self.UK(self.q + 2j * np.pi / self.N / Delta * m)
+        self._u = self.MK(self.q + 2j * np.pi / self.N / Delta * m)
         self._u *= np.exp(-2j * np.pi * lnxy / self.N / Delta * m)
 
         # following is unnecessary because hfft ignores the imag at Nyquist anyway

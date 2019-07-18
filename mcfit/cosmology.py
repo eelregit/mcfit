@@ -17,8 +17,8 @@ class P2xi(mcfit):
     """
     def __init__(self, k, l=0, deriv=0, q=1.5, **kwargs):
         self.l = l
-        UK = kernels.Mellin_SphericalBesselJ(l, deriv)
-        mcfit.__init__(self, k, UK, q, **kwargs)
+        MK = kernels.Mellin_SphericalBesselJ(l, deriv)
+        mcfit.__init__(self, k, MK, q, **kwargs)
         phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
         self.prefac *= phase / (2*pi)**1.5 * self.x**3
 
@@ -29,8 +29,8 @@ class xi2P(mcfit):
     """
     def __init__(self, r, l=0, deriv=0, q=1.5, **kwargs):
         self.l = l
-        UK = kernels.Mellin_SphericalBesselJ(l, deriv)
-        mcfit.__init__(self, r, UK, q, **kwargs)
+        MK = kernels.Mellin_SphericalBesselJ(l, deriv)
+        mcfit.__init__(self, r, MK, q, **kwargs)
         self.prefac *= self.x**3
         phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
         self.postfac *= (2*pi)**1.5 / phase
@@ -48,8 +48,8 @@ class TophatVar(mcfit):
     >>> sigma8 = numpy.sqrt(varR(8))
     """
     def __init__(self, k, deriv=0, q=1.5, **kwargs):
-        UK = kernels.Mellin_TophatSq(3, deriv)
-        mcfit.__init__(self, k, UK, q, **kwargs)
+        MK = kernels.Mellin_TophatSq(3, deriv)
+        mcfit.__init__(self, k, MK, q, **kwargs)
         self.prefac *= self.x**3 / (2 * pi**2)
 
 
@@ -57,8 +57,8 @@ class GaussVar(mcfit):
     """Variance in a Gaussian window.
     """
     def __init__(self, k, deriv=0, q=1.5, **kwargs):
-        UK = kernels.Mellin_GaussSq(deriv)
-        mcfit.__init__(self, k, UK, q, **kwargs)
+        MK = kernels.Mellin_GaussSq(deriv)
+        mcfit.__init__(self, k, MK, q, **kwargs)
         self.prefac *= self.x**3 / (2 * pi**2)
 
 

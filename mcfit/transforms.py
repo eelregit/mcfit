@@ -20,8 +20,8 @@ class Hankel(mcfit):
     """
     def __init__(self, x, nu=0, deriv=0, q=1, **kwargs):
         self.nu = nu
-        UK = kernels.Mellin_BesselJ(nu, deriv)
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        MK = kernels.Mellin_BesselJ(nu, deriv)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x**2
 
 
@@ -30,8 +30,8 @@ class SphericalBessel(mcfit):
     """
     def __init__(self, x, nu=0, deriv=0, q=1.5, **kwargs):
         self.nu = nu
-        UK = kernels.Mellin_SphericalBesselJ(nu, deriv)
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        MK = kernels.Mellin_SphericalBesselJ(nu, deriv)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x**3
 
 
@@ -39,8 +39,8 @@ class FourierSine(mcfit):
     """Fourier sine transform pair.
     """
     def __init__(self, x, deriv=0, q=0.5, **kwargs):
-        UK = kernels.Mellin_FourierSine(deriv)
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        MK = kernels.Mellin_FourierSine(deriv)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x
 
 
@@ -48,8 +48,8 @@ class FourierCosine(mcfit):
     """Fourier cosine transform pair.
     """
     def __init__(self, x, deriv=0, q=0.5, **kwargs):
-        UK = kernels.Mellin_FourierCosine(deriv)
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        MK = kernels.Mellin_FourierCosine(deriv)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x
 
 
@@ -78,12 +78,12 @@ class DoubleBessel(mcfit):
             nu2 = nu
         self.nu1 = nu1
         self.nu2 = nu2
-        UK = kernels.Mellin_DoubleBesselJ(alpha, nu1, nu2)
+        MK = kernels.Mellin_DoubleBesselJ(alpha, nu1, nu2)
         if q is None:
             q = 1
             if alpha == 1:
                 q = 0.5
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x**2
 
 
@@ -112,12 +112,12 @@ class DoubleSphericalBessel(mcfit):
             nu2 = nu
         self.nu1 = nu1
         self.nu2 = nu2
-        UK = kernels.Mellin_DoubleSphericalBesselJ(alpha, nu1, nu2)
+        MK = kernels.Mellin_DoubleSphericalBesselJ(alpha, nu1, nu2)
         if q is None:
             q = 2
             if alpha == 1:
                 q = 1.5
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x**3
 
 
@@ -126,8 +126,8 @@ class TophatSmooth(mcfit):
     """
     def __init__(self, x, dim=3, deriv=0, q=0, **kwargs):
         self.dim = dim
-        UK = kernels.Mellin_Tophat(dim, deriv)
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        MK = kernels.Mellin_Tophat(dim, deriv)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x**dim / (2**(dim-1) * pi**(dim/2) * gamma(dim/2))
 
 
@@ -136,6 +136,6 @@ class GaussSmooth(mcfit):
     """
     def __init__(self, x, dim=3, deriv=0, q=0, **kwargs):
         self.dim = dim
-        UK = kernels.Mellin_Gauss(deriv)
-        mcfit.__init__(self, x, UK, q, **kwargs)
+        MK = kernels.Mellin_Gauss(deriv)
+        mcfit.__init__(self, x, MK, q, **kwargs)
         self.prefac *= self.x**dim / (2**(dim-1) * pi**(dim/2) * gamma(dim/2))
