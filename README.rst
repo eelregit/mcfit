@@ -50,7 +50,7 @@ One can perform the following pair of Hankel transforms
 
 .. math::
 
-    e^{-y} &= \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx \\
+    e^{-y} &= \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx
     (1+y^2)^{-\frac32} &= \int_0^\infty e^{-y} J_0(xy) x dx
 
 easily as follows

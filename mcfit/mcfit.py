@@ -23,7 +23,7 @@ class mcfit(object):
     Parameters
     ----------
     x : (Nin,) array_like
-        logarithmically spaced input argument
+        log-spaced input argument
     MK : callable
         Mellin transform of the kernel
         .. math:: U_K(z) \equiv \int_0^\infty t^{z-1} K(t) dt
@@ -34,24 +34,25 @@ class mcfit(object):
         size of convolution, if complex then replaced by the smallest power of
         2 that is at least `N.imag` times the size of `x`; the input function
         is padded symmetrically to this size before convolution (see the
-        `extrap` argument for available options)
+        `extrap` argument for available options); `N=len(x)` turns off the
+        padding
     lowring : bool, optional
         if True and `N` is even, set `y` according to the low-ringing
         condition, otherwise see `xy`
     xy : float, optional
-        reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` when
-        `lowring` is False or `N` is odd.
-        `xy = x[1] * y[-1] = ... = x[i] * y[-i] = ... = x[-1] * y[1]`.
+        reciprocal product :math:`x_{min} y_{max} = x_{max} y_{min}` to be used
+        when `lowring` is False or `N` is odd.
+        `xy = x[0] * y_max = x[1] * y[-1] = ... = x[i] * y[-i] = ... = x[-1] * y[1] = x_max * y[0]`.
         Note that :math:`x_{max}` is not included in `x` but bigger than
-        `x.max()` by one logarithmic interval due to the discretization of the
-        periodic approximant, and likewise for :math:`y_{max}`
+        `x.max()` by one log interval due to the discretization of the periodic
+        approximant, and likewise for :math:`y_{max}`
 
     Attributes
     ----------
     Nin : int
-        input (and output) size
+        input size, and that of the output if not `keeppads`
     N : int
-        convolution size
+        convolution size, and that of the output if `keeppads`
     x : (Nin,) ndarray
         input argument
     y : (Nin,) ndarray
@@ -149,17 +150,17 @@ class mcfit(object):
 
     def _setup(self):
         if self.Nin < 2:
-            raise ValueError("input size too small")
+            raise ValueError("input size must not be smaller than 2")
         Delta = np.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
         x_head = self.x[:10]
         if not np.allclose(np.log(x_head[1:] / x_head[:-1]), Delta, rtol=1e-3):
-            warnings.warn("input must be logarithmically spaced")
+            warnings.warn("input must be log-spaced")
 
         if isinstance(self.N, complex):
             folds = int(np.ceil(np.log2(self.Nin * self.N.imag)))
             self.N = 2**folds
         if self.N < self.Nin:
-            raise ValueError("convolution size must be larger than input size")
+            raise ValueError("convolution size must not be smaller than input size")
 
         if self.lowring and self.N % 2 == 0:
             lnxy = Delta / np.pi * np.angle(self.MK(self.q + 1j * np.pi / Delta))
@@ -186,7 +187,8 @@ class mcfit(object):
         Parameters
         ----------
         F : (..., Nin, ...) or (..., N, ...) array_like
-            input function; skip padding if already of size `N`
+            input function; to be padded according to `extrap` in size from
+            `Nin` to `N`, but not if already of size `N`
         axis : int, optional
             axis along which to integrate
         extrap : {bool, 'const'} or 2-tuple, optional
@@ -206,7 +208,7 @@ class mcfit(object):
         Returns
         -------
         y : (Nin,) or (N,) ndarray
-            logarithmically spaced output argument
+            log-spaced output argument
         G : (..., Nin, ...) or (..., N, ...) ndarray
             output function
         """
@@ -326,7 +328,7 @@ class mcfit(object):
         Parameters
         ----------
         a : (..., Nin, ...) or (..., N, ...) ndarray
-            array to be padded; skip padding if already of size `N`
+            array to be padded, but not if already of size `N`
         axis : int
             axis along which to pad
         extrap : {bool, 'const'} or 2-tuple
@@ -345,7 +347,7 @@ class mcfit(object):
         if a.shape[axis] == self.N:
             return a
         elif a.shape[axis] != self.Nin:
-            raise ValueError("array much be of size len(x) or N")
+            raise ValueError("array size must be that of the input or the convolution")
 
         axis %= a.ndim  # to fix the indexing below with axis+1
 
@@ -399,7 +401,7 @@ class mcfit(object):
         Parameters
         ----------
         a : (..., N, ...) or (..., Nin, ...) ndarray
-            array to be unpadded; skip unpadding if already of size `Nin`
+            array to be unpadded, but not if already of size `Nin`
         axis : int
             axis along which to unpad
         out : bool
@@ -410,7 +412,7 @@ class mcfit(object):
         if a.shape[axis] == self.Nin:
             return a
         elif a.shape[axis] != self.N:
-            raise ValueError("array much be of size N or len(x)")
+            raise ValueError("array size must be that of the input or the convolution")
 
         Npad = self.N - self.Nin
         if out:
