@@ -14,6 +14,14 @@ Features
 * Easily extensible for other kernels
 
 
+Installation
+------------
+
+.. code-block:: bash
+
+    pip install mcfit
+
+
 Algorithm
 ---------
 
