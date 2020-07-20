@@ -310,13 +310,13 @@ where
 
 \subparagraph{Power spectrum to correlation function}
 \begin{equation}
-    \xi_l(r) = i^l \int_0^\infty \frac{k^3P_l(k)}{2\pi^2} j_l(kr) \,\frac{\d k}k
+    \xi_l(r) = i^\ell \int_0^\infty \frac{k^3P_l(k)}{2\pi^2} j_l(kr) \,\frac{\d k}k
 \end{equation}
 \begin{align}
     x &\to k \\
     y &\to r \\
-    f(k) &= \frac{i^l k^{3-q} P_l(k)}{(2\pi)^\frac32} \\
-    g(r) &= r^q \xi_l(r)
+    f(k) &= \frac{k^{3-q} P_l(k)}{(2\pi)^\frac32} \\
+    g(r) &= i^{-\ell} r^q \xi_l(r)
 \end{align}
 with the rest the same as the spherical Bessel transform.
 
@@ -324,13 +324,13 @@ with the rest the same as the spherical Bessel transform.
 \subparagraph{Correlation function to power spectrum}
 also radial profile to its Fourier transform
 \begin{equation}
-    P_l(k) = (-i)^l \int_0^\infty 4\pi r^3\xi_l(r) j_l(kr) \,\frac{\d r}r
+    P_l(k) = (-i)^\ell \int_0^\infty 4\pi r^3\xi_l(r) j_l(kr) \,\frac{\d r}r
 \end{equation}
 \begin{align}
     x &\to r \\
     y &\to k \\
     f(r) &= r^{3-q} \xi_l(r) \\
-    g(k) &= \frac{i^l k^q P_l(k)}{(2\pi)^\frac32}
+    g(k) &= \frac{i^\ell k^q P_l(k)}{(2\pi)^\frac32}
 \end{align}
 with the rest the same as the spherical Bessel transform.
 The 2-pt function conversion pair is symmetric when $q=\frac32$.

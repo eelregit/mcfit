@@ -20,7 +20,8 @@ class P2xi(mcfit):
         MK = kernels.Mellin_SphericalBesselJ(l, deriv)
         mcfit.__init__(self, k, MK, q, **kwargs)
         phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
-        self.prefac *= phase / (2*pi)**1.5 * self.x**3
+        self.prefac *= self.x**3 / (2*pi)**1.5
+        self.postfac *= phase
 
 
 class xi2P(mcfit):
