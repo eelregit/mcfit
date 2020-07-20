@@ -17,11 +17,16 @@ class P2xi(mcfit):
 
     Parameters
     ----------
+    k : see `x` in :class:`mcfit.mcfit`
+    l : int
+        order
     n : int
         to generalize correlation function with extra power law factor
         :math:`k^n` in the integrand. The tilt parameter `q` is automatically
         adjusted (to `q+n`) based on the provided value. The phase factor is
         ignored if it is not None
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, k, l=0, n=None, deriv=0, q=1.5, **kwargs):
         self.l = l
@@ -41,6 +46,14 @@ class P2xi(mcfit):
 class xi2P(mcfit):
     """Correlation function to power spectrum, also radial profile to its
     Fourier transform.
+
+    Parameters
+    ----------
+    r : see `x` in :class:`mcfit.mcfit`
+    l : int
+        order
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, r, l=0, deriv=0, q=1.5, **kwargs):
         self.l = l
@@ -54,6 +67,10 @@ class xi2P(mcfit):
 class TophatVar(mcfit):
     r"""Variance in a top-hat window.
 
+    Parameters
+    ----------
+    k : see `x` in :class:`mcfit.mcfit`
+
     Examples
     --------
     To compute :math:`\sigma_8` of a linear power spectrum :math:`P(k)`
@@ -61,6 +78,8 @@ class TophatVar(mcfit):
     >>> from scipy.interpolate import CubicSpline
     >>> varR = CubicSpline(R, var)
     >>> sigma8 = numpy.sqrt(varR(8))
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, k, deriv=0, q=1.5, **kwargs):
         MK = kernels.Mellin_TophatSq(3, deriv)
@@ -70,6 +89,12 @@ class TophatVar(mcfit):
 
 class GaussVar(mcfit):
     """Variance in a Gaussian window.
+
+    Parameters
+    ----------
+    k : see `x` in :class:`mcfit.mcfit`
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, k, deriv=0, q=1.5, **kwargs):
         MK = kernels.Mellin_GaussSq(deriv)
@@ -81,6 +106,12 @@ class ExcursionSet(mcfit):
     """Excursion set trajectory.
 
     BCEK 91 model
+
+    Parameters
+    ----------
+    k : see `x` in :class:`mcfit.mcfit`
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, k, q=0, **kwargs):
         raise NotImplementedError

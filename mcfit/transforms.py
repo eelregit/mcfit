@@ -17,6 +17,13 @@ __all__ = ['Hankel', 'SphericalBessel', 'DoubleBessel', 'DoubleSphericalBessel',
 
 class Hankel(mcfit):
     """Hankel transform pair.
+
+    Parameters
+    ----------
+    nu : float
+        order
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, nu=0, deriv=0, q=1, **kwargs):
         self.nu = nu
@@ -27,6 +34,13 @@ class Hankel(mcfit):
 
 class SphericalBessel(mcfit):
     """Spherical Bessel transform pair.
+
+    Parameters
+    ----------
+    nu : int
+        order
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, nu=0, deriv=0, q=1.5, **kwargs):
         self.nu = nu
@@ -37,6 +51,8 @@ class SphericalBessel(mcfit):
 
 class FourierSine(mcfit):
     """Fourier sine transform pair.
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, deriv=0, q=0.5, **kwargs):
         MK = kernels.Mellin_FourierSine(deriv)
@@ -46,6 +62,8 @@ class FourierSine(mcfit):
 
 class FourierCosine(mcfit):
     """Fourier cosine transform pair.
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, deriv=0, q=0.5, **kwargs):
         MK = kernels.Mellin_FourierCosine(deriv)
@@ -69,6 +87,8 @@ class DoubleBessel(mcfit):
         default is nu
     nu2 : float, optional
         default is nu
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, **kwargs):
         self.alpha = alpha
@@ -103,6 +123,8 @@ class DoubleSphericalBessel(mcfit):
         default is nu
     nu2 : float, optional
         default is nu
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, alpha, nu=0, nu1=None, nu2=None, q=None, **kwargs):
         self.alpha = alpha
@@ -123,6 +145,13 @@ class DoubleSphericalBessel(mcfit):
 
 class TophatSmooth(mcfit):
     """Top-hat smoothing of a radial function.
+
+    Parameters
+    ----------
+    dim : int
+        dimension of the smoothing filter
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, dim=3, deriv=0, q=0, **kwargs):
         self.dim = dim
@@ -133,6 +162,13 @@ class TophatSmooth(mcfit):
 
 class GaussSmooth(mcfit):
     """Gaussian smoothing of a radial function.
+
+    Parameters
+    ----------
+    dim : int
+        dimension of the smoothing filter
+
+    See :class:`mcfit.mcfit`
     """
     def __init__(self, x, dim=3, deriv=0, q=0, **kwargs):
         self.dim = dim
