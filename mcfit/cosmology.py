@@ -14,13 +14,27 @@ __all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar', 'ExcursionSet']
 
 class P2xi(mcfit):
     """Power spectrum to correlation function.
+
+    Parameters
+    ----------
+    n : int
+        to generalize correlation function with extra power law factor
+        :math:`k^n` in the integrand. The tilt parameter `q` is automatically
+        adjusted (to `q+n`) based on the provided value. The phase factor is
+        ignored if it is not None
     """
-    def __init__(self, k, l=0, deriv=0, q=1.5, **kwargs):
+    def __init__(self, k, l=0, n=None, deriv=0, q=1.5, **kwargs):
         self.l = l
         MK = kernels.Mellin_SphericalBesselJ(l, deriv)
-        mcfit.__init__(self, k, MK, q, **kwargs)
-        phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
-        self.prefac *= self.x**3 / (2*pi)**1.5
+
+        if n is None:
+            phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
+            n = 0
+        else:
+            phase = 1
+
+        mcfit.__init__(self, k, MK, q+n, **kwargs)
+        self.prefac *= self.x**(3+n) / (2*pi)**1.5
         self.postfac *= phase
 
 
