@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from setuptools import setup
 
 def find_version(path):

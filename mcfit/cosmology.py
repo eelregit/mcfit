@@ -22,9 +22,9 @@ class P2xi(mcfit):
         order
     n : int
         to generalize correlation function with extra power law factor
-        :math:`k^n` in the integrand. The tilt parameter `q` is automatically
-        adjusted (to `q+n`) based on the provided value. The phase factor is
-        ignored if it is not None
+        :math:`k^n` in the integrand. If not None, the phase factor is ignored.
+        The tilt parameter `q` is automatically adjusted (to `q+n`) based on
+        the provided value
 
     See :class:`mcfit.mcfit`
     """
