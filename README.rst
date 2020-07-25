@@ -6,11 +6,26 @@ Features
 --------
 
 * Compute integral transforms
+
+  .. image:: https://quicklatex.com/cache3/0d/ql_e69c538d443d3d13557b65a8bf42450d_l3.svg
+    :height: 40px
+    :alt: G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x
+
 * Inverse transform without analytic inversion
 * Integral kernels as derivatives
-* Transform input array along any axis
+
+  .. image:: https://quicklatex.com/cache3/60/ql_19538548206cb4dc2efdd79b18fed960_l3.svg
+    :height: 40px
+    :alt: G(y) = \int_0^\infty F(x) K'(xy) \frac{dx}x
+
+* Transform input array along any axis of `numpy.ndarray`
 * Output the matrix form
 * 1-to-n transform for multiple kernels (TODO)
+
+  .. image:: https://quicklatex.com/cache3/cb/ql_714cf32b0292b455d705ea1f7e8af5cb_l3.svg
+    :height: 45px
+    :alt: G(y_1, \cdots, y_n) = \int_0^\infty \frac{dx}x F(x) \prod_{a=1}^n K_a(xy_a)
+
 * Easily extensible for other kernels
 
 
@@ -27,15 +42,19 @@ Algorithm
 
 `mcfit` computes integral transforms of the form
 
-.. math:: G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x
+.. image:: https://quicklatex.com/cache3/0d/ql_e69c538d443d3d13557b65a8bf42450d_l3.svg
+   :height: 40px
+   :alt: G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x
 
 where :math:`F(x)` is the input function, :math:`G(y)` is the output function,
 and :math:`K(xy)` is the integral kernel.
 One is free to scale all three functions by a power law
 
-.. math:: g(y) = \int_0^\infty f(x) k(xy) \frac{dx}x
+.. image:: https://quicklatex.com/cache3/88/ql_1acb3707cee03cdfd479bd19d3451c88_l3.svg
+   :height: 40px
+   :alt: g(y) = \int_0^\infty f(x) k(xy) \frac{dx}x
 
-where :math:`f(x)=x^{-q}F(x)`, :math:`g(y)=y^q G(y)`, and :math:`k(t)=t^q K(t)`.
+where :math:`f(x)=x^{-q} F(x)`, :math:`g(y)=y^q G(y)`, and :math:`k(t)=t^q K(t)`.
 And :math:`q` is a tilt parameter serving to shift power of :math:`x` between
 the input function and the kernel.
 
@@ -56,10 +75,10 @@ Examples
 
 One can perform the following pair of Hankel transforms
 
-.. math::
-
-    e^{-y} &= \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx
-    (1+y^2)^{-\frac32} &= \int_0^\infty e^{-x} J_0(xy) x dx
+.. image:: https://quicklatex.com/cache3/ca/ql_956d8913782773b15b757d093dfee9ca_l3.svg
+   :height: 80px
+   :alt: e^{-y} = \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx,
+         (1+y^2)^{-\frac32} = \int_0^\infty e^{-x} J_0(xy) x dx
 
 easily as follows
 
