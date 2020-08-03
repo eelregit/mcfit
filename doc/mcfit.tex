@@ -310,27 +310,43 @@ where
 
 \subparagraph{Power spectrum to correlation function}
 \begin{equation}
-    \xi_l(r) = i^\ell \int_0^\infty \frac{k^3P_l(k)}{2\pi^2} j_l(kr) \,\frac{\d k}k
+    \xi_\ell(r) = i^\ell \int_0^\infty \frac{k^3P_\ell(k)}{2\pi^2} j_\ell(kr) \,\frac{\d k}k
 \end{equation}
 \begin{align}
     x &\to k \\
     y &\to r \\
-    f(k) &= \frac{k^{3-q} P_l(k)}{(2\pi)^\frac32} \\
-    g(r) &= i^{-\ell} r^q \xi_l(r)
+    f(k) &= \frac{k^{3-q} P_\ell(k)}{(2\pi)^\frac32} \\
+    g(r) &= i^{-\ell} r^q \xi_\ell(r)
 \end{align}
 with the rest the same as the spherical Bessel transform.
+
+Many applications define a \textbf{generalized correlation function}
+similar to the following
+\begin{equation}
+    \Xi_\ell^{(n)}(r) = \int_0^\infty \frac{k^{3+n}P_\ell(k)}{2\pi^2} j_\ell(kr) \,\frac{\d k}k
+\end{equation}
+\begin{align}
+    x &\to k \\
+    y &\to r \\
+    f(k) &= \frac{k^{3+n-q} P_\ell(k)}{(2\pi)^\frac32} \\
+    g(r) &= r^q \Xi_\ell(r)
+\end{align}
+Note the absence of the phase factor compared to $\xi_\ell$.
+We combine the implementations of $\xi_\ell$ and $\Xi_\ell^{(n)}$,
+and adjust $q \to q+n$ to cancel out $k^n$ to keep $f(k)$ balanced.
+This adjustment is automatic.
 
 
 \subparagraph{Correlation function to power spectrum}
 also radial profile to its Fourier transform
 \begin{equation}
-    P_l(k) = (-i)^\ell \int_0^\infty 4\pi r^3\xi_l(r) j_l(kr) \,\frac{\d r}r
+    P_\ell(k) = (-i)^\ell \int_0^\infty 4\pi r^3\xi_\ell(r) j_\ell(kr) \,\frac{\d r}r
 \end{equation}
 \begin{align}
     x &\to r \\
     y &\to k \\
-    f(r) &= r^{3-q} \xi_l(r) \\
-    g(k) &= \frac{i^\ell k^q P_l(k)}{(2\pi)^\frac32}
+    f(r) &= r^{3-q} \xi_\ell(r) \\
+    g(k) &= \frac{i^\ell k^q P_\ell(k)}{(2\pi)^\frac32}
 \end{align}
 with the rest the same as the spherical Bessel transform.
 The 2-pt function conversion pair is symmetric when $q=\frac32$.
