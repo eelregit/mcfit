@@ -29,14 +29,6 @@ Features
 * Easily extensible for other kernels
 
 
-Installation
-------------
-
-.. code-block:: bash
-
-    pip install mcfit
-
-
 Algorithm
 ---------
 
@@ -68,6 +60,22 @@ One can calculate the latter analytically as a Mellin transform.
 This algorithm is optimal when the input function is smooth in :math:`\ln x`,
 and is ideal for oscillatory kernels with input spanning a wide range in
 :math:`\ln x`.
+
+
+Installation
+------------
+
+.. code-block:: bash
+
+    pip install mcfit
+
+
+Documentation
+-------------
+
+See docstring of :class:`mcfit.mcfit`, which also applies to other
+subclasses of transformations.
+Also see `doc/mcfit.tex` for more explanations.
 
 
 Examples
