@@ -5,7 +5,7 @@ from mcfit import kernels
 from numpy import pi
 
 
-__all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar', 'ExcursionSet']
+__all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar']
 
 
 class P2xi(mcfit):
@@ -96,18 +96,3 @@ class GaussVar(mcfit):
         MK = kernels.Mellin_GaussSq(deriv)
         mcfit.__init__(self, k, MK, q, **kwargs)
         self.prefac *= self.x**3 / (2 * pi**2)
-
-
-class ExcursionSet(mcfit):
-    """Excursion set trajectory.
-
-    BCEK 91 model
-
-    Parameters
-    ----------
-    k : see `x` in :class:`mcfit.mcfit`
-
-    See :class:`mcfit.mcfit`
-    """
-    def __init__(self, k, q=0, **kwargs):
-        raise NotImplementedError
