@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import assert_allclose
-from ..transforms import *
+from mcfit.transforms import *
 
 def test_Hankel():
     def F_fun(x): return 1 / (1 + x*x)**1.5

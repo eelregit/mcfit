@@ -1,18 +1,13 @@
-"""
-===========================================
-Common Integral transforms and applications
-===========================================
-"""
+"""Common Integral transforms and applications"""
 
-from __future__ import division
-from .mcfit import mcfit
-from . import kernels
+from mcfit.mcfit import mcfit
+from mcfit import kernels
 from numpy import pi
 from scipy.special import gamma
 
 
 __all__ = ['Hankel', 'SphericalBessel', 'DoubleBessel', 'DoubleSphericalBessel',
-            'FourierSine', 'FourierCosine', 'TophatSmooth', 'GaussSmooth']
+           'FourierSine', 'FourierCosine', 'TophatSmooth', 'GaussSmooth']
 
 
 class Hankel(mcfit):

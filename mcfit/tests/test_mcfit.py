@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import assert_allclose
-from ..transforms import *
+from mcfit.transforms import *
 
 
 def test_matrix():

@@ -1,11 +1,7 @@
-"""
-======================
-Cosmology applications
-======================
-"""
+"""Cosmology applications"""
 
-from .mcfit import mcfit
-from . import kernels
+from mcfit.mcfit import mcfit
+from mcfit import kernels
 from numpy import pi
 
 
