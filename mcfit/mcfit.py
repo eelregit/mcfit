@@ -83,7 +83,6 @@ class mcfit(object):
     -------
     __call__
     matrix
-    check
 
     Examples
     --------
@@ -420,40 +419,3 @@ class mcfit(object):
             _Npad, Npad_ = Npad//2, Npad - Npad//2
 
         return np.take(a, range(_Npad, self.N - Npad_), axis=axis)
-
-
-    def check(self, F):
-        """Rough sanity checks on the input function.
-        """
-
-        assert F.ndim == 1, "checker only supports 1D"
-
-        f = self.xfac * F
-        fabs = np.abs(f)
-
-        iQ1, iQ3 = np.searchsorted(fabs.cumsum(), np.array([0.25, 0.75]) * fabs.sum())
-        assert 0 != iQ1 != iQ3 != self.Nin, "checker giving up"
-        fabs_l = fabs[:iQ1].mean()
-        fabs_m = fabs[iQ1:iQ3].mean()
-        fabs_r = fabs[iQ3:].mean()
-
-        if fabs_l > fabs_m:
-            warnings.warn("left wing seems heavy: {:.2g} vs {:.2g}, "
-                    "change tilt and mind convergence".format(fabs_l, fabs_m), RuntimeWarning)
-        if fabs_m < fabs_r:
-            warnings.warn("right wing seems heavy: {:.2g} vs {:.2g}, "
-                    "change tilt and mind convergence".format(fabs_m, fabs_r), RuntimeWarning)
-
-        if fabs[0] > fabs[1]:
-            warnings.warn("left tail may blow up: {:.2g} vs {:.2g}, "
-                    "change tilt or avoid extrapolation".format(f[0], f[1]), RuntimeWarning)
-        if fabs[-2] < fabs[-1]:
-            warnings.warn("right tail may blow up: {:.2g} vs {:.2g}, "
-                    "change tilt or avoid extrapolation".format(f[-2], f[-1]), RuntimeWarning)
-
-        if f[0]*f[1] <= 0:
-            warnings.warn("left tail looks wiggly: {:.2g} vs {:.2g}, "
-                    "avoid extrapolation".format(f[0], f[1]), RuntimeWarning)
-        if f[-2]*f[-1] <= 0:
-            warnings.warn("right tail looks wiggly: {:.2g} vs {:.2g}, "
-                    "avoid extrapolation".format(f[-2], f[-1]), RuntimeWarning)
