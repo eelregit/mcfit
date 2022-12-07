@@ -105,6 +105,7 @@ class mcfit(object):
             Journal of Computational Physics, 29:35-48, October 1978.
     .. [2] A. J. S. Hamilton. Uncorrelated modes of the non-linear power spectrum.
             MNRAS, 312:257-284, February 2000.
+
     """
 
     def __init__(self, x, MK, q, N=2j, lowring=False, xy=1):
@@ -119,11 +120,6 @@ class mcfit(object):
         self._setup()
         self.prefac = 1
         self.postfac = 1
-
-        if lowring == False:
-            warnings.warn("The default value of lowring has been changed to False, "
-                "set it to True if you cannot reproduce previous results")
-
 
     @property
     def prefac(self):
@@ -144,7 +140,6 @@ class mcfit(object):
         self._postfac = value
         self.yfac = self._postfac * self.y**(-self.q)
         self._yfac_ = self._pad(self.yfac, 0, True, True)
-
 
     def _setup(self):
         if self.Nin < 2:
@@ -178,7 +173,6 @@ class mcfit(object):
         #if not self.lowring and self.N % 2 == 0:
         #    self._u[self.N//2] = self._u[self.N//2].real
 
-
     def __call__(self, F, axis=-1, extrap=False, keeppads=False, convonly=False):
         """Evaluate the integral.
 
@@ -209,12 +203,8 @@ class mcfit(object):
             log-spaced output argument
         G : (..., Nin, ...) or (..., N, ...) ndarray
             output function
+
         """
-
-        if extrap == False:
-            warnings.warn("The default value of extrap has been changed to False, "
-                "set it to True if you cannot reproduce previous results")
-
         F = np.asarray(F)
 
         to_axis = [1] * F.ndim
@@ -240,21 +230,19 @@ class mcfit(object):
                 _G_ = self._yfac_.reshape(to_axis) * _G_
             return self._y_, _G_
 
-
     def inv(self):
         """Invert the transform.
 
         After calling this method, calling the instance will do the inverse
         transform. Calling this twice return the instance to the original
         transform.
-        """
 
+        """
         self.x, self.y = self.y, self.x
         self._x_, self._y_ = self._y_, self._x_
         self.xfac, self.yfac = 1 / self.yfac, 1 / self.xfac
         self._xfac_, self._yfac_ = 1 / self._yfac_, 1 / self._xfac_
         self._u = 1 / self._u.conj()
-
 
     def matrix(self, full=False, keeppads=True):
         """Return matrix form of the integral transform.
@@ -298,8 +286,8 @@ class mcfit(object):
         are diagonalized by the DFT matrix.
         Thus :math:`1/u_m` are the eigenvalues of the inverse convolution
         matrix.
-        """
 
+        """
         v = np.fft.hfft(self._u, n=self.N) / self.N
         idx = sum(np.ogrid[0:self.N, -self.N:0])
         C = v[idx]  # follow scipy.linalg.{circulant,toeplitz,hankel}
@@ -318,7 +306,6 @@ class mcfit(object):
             return a, b, C
         else:
             return a * C * b
-
 
     def _pad(self, a, axis, extrap, out):
         """Add padding to an array.
@@ -340,8 +327,8 @@ class mcfit(object):
         out : bool
             pad the output if True, otherwise the input; the two cases have
             their left and right pad sizes reversed
-        """
 
+        """
         if a.shape[axis] == self.N:
             return a
         elif a.shape[axis] != self.Nin:
@@ -392,7 +379,6 @@ class mcfit(object):
 
         return np.concatenate((_a, a, a_), axis=axis)
 
-
     def _unpad(self, a, axis, out):
         """Undo padding in an array.
 
@@ -405,8 +391,8 @@ class mcfit(object):
         out : bool
             unpad the output if True, otherwise the input; the two cases have
             their left and right pad sizes reversed
-        """
 
+        """
         if a.shape[axis] == self.Nin:
             return a
         elif a.shape[axis] != self.N:
