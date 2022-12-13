@@ -3,16 +3,17 @@
 
 ## Features
 
-* Compute integral transforms
-  $$G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x$$
-* Inverse transform without analytic inversion
-* Integral kernels as derivatives
-  $$G(y) = \int_0^\infty F(x) K'(xy) \frac{dx}x$$
-* Transform input array along any axis of `numpy.ndarray`
-* Output the matrix form
-* 1-to-n transform for multiple kernels (TODO)
-  $$G(y_1, \cdots, y_n) = \int_0^\infty \frac{dx}x F(x) \prod_{a=1}^n K_a(xy_a)$$
-* Easily extensible for other kernels
+* Compute integral transforms:
+  $$G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x;$$
+* Inverse transform without analytic inversion;
+* Integral kernels as derivatives:
+  $$G(y) = \int_0^\infty F(x) K'(xy) \frac{dx}x;$$
+* Transform input array along any axis of `ndarray`;
+* Output the matrix form;
+* 1-to-n transform for multiple kernels (TODO):
+  $$G(y_1, \cdots, y_n) = \int_0^\infty \frac{dx}x F(x) \prod_{a=1}^n K_a(xy_a);$$
+* Easily extensible for other kernels;
+* Support NumPy and JAX.
 
 
 ## Algorithm
@@ -30,9 +31,9 @@ input function and the kernel.
 `mcfit` implements the FFTLog algorithm.
 The idea is to take advantage of the convolution theorem in $\ln x$ and
 $\ln y$.
-It approximates the input function with truncated Fourier series over
-one period of a periodic approximant, and use the exact Fourier
-transform of the kernel.
+It approximates the input function with a partial sum of the Fourier
+series over one period of a periodic approximant, and use the exact
+Fourier transform of the kernel.
 One can calculate the latter analytically as a Mellin transform.
 This algorithm is optimal when the input function is smooth in $\ln x$,
 and is ideal for oscillatory kernels with input spanning a wide range in
