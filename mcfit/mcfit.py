@@ -195,7 +195,7 @@ class mcfit(object):
         m = numpy.arange(0, self.N//2 + 1)
         self._u = self.MK(self.q + 2j * math.pi / self.N / Delta * m)
         self._u *= numpy.exp(-2j * math.pi * lnxy / self.N / Delta * m)
-        self._u = self.np.asarray(self._u)
+        self._u = self.np.asarray(self._u, dtype=(self.x[0] + 0j).dtype)
 
         # following is unnecessary because hfft ignores the imag at Nyquist anyway
         #if not self.lowring and self.N % 2 == 0:
