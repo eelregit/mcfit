@@ -96,3 +96,59 @@ class GaussVar(mcfit):
         MK = kernels.Mellin_GaussSq(deriv)
         mcfit.__init__(self, k, MK, q, **kwargs)
         self.prefac *= self.x**3 / (2 * pi**2)
+
+        
+class C2w(Hankel):
+    """2D power spectrum to correlation function.
+
+    Parameters
+    ----------
+    ell : 2 * pi * `x`. For `x` see in :class:`mcfit.Hankel`
+    nu : int
+        order
+
+    See :class:`mcfit.Hankel`
+    """
+    def __init__(self, ell, nu=0, **kwargs):
+        k = ell / 2 / pi
+        Hankel.__init__(self, x=k, nu=nu, deriv=0, q=1, **kwargs)
+        self.postfac *= 2 * pi
+        
+        self.ell = ell
+        self.theta = self.y / 2 / pi
+        
+    def __call__(self, C, **kwargs):
+        """
+        Returns theta[rad] and w(theta) 
+        """
+        r, w = super().__call__(F=C, **kwargs)
+        theta = r / 2 / pi
+        
+        return theta, w
+
+class w2C(Hankel):
+    """2D correlation function to power spectrum.
+
+    Parameters
+    ----------
+    theta : `x` / 2 / pi. For `x` see in :class:`mcfit.Hankel`
+    nu : int
+        order
+
+    See :class:`mcfit.Hankel`
+    """
+    def __init__(self, theta, nu=0, **kwargs):
+        r = theta * 2 * pi
+        Hankel.__init__(self, x=r, nu=nu, deriv=0, q=1, **kwargs)
+        self.postfac /= 2 * pi
+        
+        self.theta = theta
+        self.ell = self.y * 2 * pi
+        
+    def __call__(self, w, **kwargs):
+        """
+        Returns ell[multipole moment] and C(ell)
+        """
+        k, C = super().__call__(F=w, **kwargs)
+        ell = k * 2 * pi
+        return ell, C
