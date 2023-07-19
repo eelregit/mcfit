@@ -5,7 +5,7 @@ from mcfit import kernels
 from numpy import pi
 
 
-__all__ = ['P2xi', 'xi2P', 'TophatVar', 'GaussVar']
+__all__ = ['P2xi', 'xi2P', 'C2w', 'w2C', 'TophatVar', 'GaussVar']
 
 
 class P2xi(mcfit):
@@ -58,6 +58,43 @@ class xi2P(mcfit):
         self.prefac *= self.x**3
         phase = (-1 if l & 2 else 1) * (1j if l & 1 else 1)  # i^l
         self.postfac *= (2*pi)**1.5 / phase
+
+
+class C2w(mcfit):
+    """Angular power spectrum to correlation function.
+
+    Parameters
+    ----------
+    ell : see `x` in :class:`mcfit.mcfit`
+    nu : int
+        order
+
+    See :class:`mcfit.mcfit`
+    """
+    def __init__(self, ell, nu=0, deriv=0, q=1, **kwargs):
+        self.nu = nu
+        MK = kernels.Mellin_BesselJ(nu, deriv)
+        mcfit.__init__(self, ell, MK, q, **kwargs)
+        self.prefac *= self.x**2 / (2*pi)
+
+
+class w2C(mcfit):
+    """Angular correlation function to power spectrum.
+
+    Parameters
+    ----------
+    theta : see `x` in :class:`mcfit.mcfit`
+    nu : int
+        order
+
+    See :class:`mcfit.mcfit`
+    """
+    def __init__(self, theta, nu=0, deriv=0, q=1, **kwargs):
+        self.nu = nu
+        MK = kernels.Mellin_BesselJ(nu, deriv)
+        mcfit.__init__(self, theta, MK, q, **kwargs)
+        self.prefac *= self.x**2
+        self.postfac *= 2*pi
 
 
 class TophatVar(mcfit):
