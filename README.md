@@ -60,51 +60,57 @@ One can perform the following pair of Hankel transforms
   $$e^{-y} = \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx, \quad (1+y^2)^{-\frac32} = \int_0^\infty e^{-x} J_0(xy) x dx$$
 easily as follows
 ```python
-  def F_fun(x): return 1 / (1 + x*x)**1.5
-  def G_fun(y): return numpy.exp(-y)
-
-  from mcfit import Hankel
+  def F_fun(x):
+      return 1 / (1 + x*x)**1.5
+  def G_fun(y):
+      return numpy.exp(-y)
 
   x = numpy.logspace(-3, 3, num=60, endpoint=False)
   F = F_fun(x)
-  H = Hankel(x, lowring=True)
+  H = mcfit.Hankel(x, lowring=True)
   y, G = H(F, extrap=True)
   numpy.allclose(G, G_fun(y), rtol=1e-8, atol=1e-8)
 
   y = numpy.logspace(-4, 2, num=60, endpoint=False)
   G = G_fun(y)
-  H_inv = Hankel(y, lowring=True)
+  H_inv = mcfit.Hankel(y, lowring=True)
   x, F = H_inv(G, extrap=True)
   numpy.allclose(F, F_fun(x), rtol=1e-10, atol=1e-10)
 ```
 
+To use JAX instead of the default numpy backend:
+```python
+  H = mcfit.Hankel(x, lowring=True, backend='jax')  # do not jit
+  H_jit = jax.jit(functools.partial(H, extrap=True))
+  y, G = H_jit(F)
+```
+While it's not necessary to apply jit or other JAX transforms to the
+constructor, one should not do it because of the scipy special functions
+in there.
+
 Cosmologists often need to transform a power spectrum to its correlation
 function
 ```python
-  from mcfit import P2xi
   k, P = numpy.loadtxt('P.txt', unpack=True)
-  r, xi = P2xi(k)(P)
+  r, xi = mcfit.P2xi(k)(P)
 ```
 and the other way around
 ```python
-  from mcfit import xi2P
   r, xi = numpy.loadtxt('xi.txt', unpack=True)
-  k, P = xi2P(r)(xi)
+  k, P = mcfit.xi2P(r)(xi)
 ```
 
 Similarly for the quadrupoles
 ```python
   k, P2 = numpy.loadtxt('P2.txt', unpack=True)
-  r, xi2 = P2xi(k, l=2)(P2)
+  r, xi2 = mcfit.P2xi(k, l=2)(P2)
 ```
 
 Also useful to the cosmologists is the tool below that computes the
 variance of the overdensity field as a function of radius, from which
 $\sigma_8$ can be interpolated.
 ```python
-  from mcfit import TophatVar
-  R, var = TophatVar(k, lowring=True)(P, extrap=True)
-  from scipy.interpolate import CubicSpline
-  varR = CubicSpline(R, var)
+  R, var = mcfit.TophatVar(k, lowring=True)(P, extrap=True)
+  varR = scipy.interpolate.CubicSpline(R, var)
   sigma8 = numpy.sqrt(varR(8))
 ```

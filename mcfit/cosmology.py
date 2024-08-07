@@ -61,7 +61,7 @@ class xi2P(mcfit):
 
 
 class C2w(mcfit):
-    """Angular power spectrum to correlation function.
+    """Flat-sky angular power spectrum to correlation function.
 
     Parameters
     ----------
@@ -79,7 +79,7 @@ class C2w(mcfit):
 
 
 class w2C(mcfit):
-    """Angular correlation function to power spectrum.
+    """Flat-sky angular correlation function to power spectrum.
 
     Parameters
     ----------

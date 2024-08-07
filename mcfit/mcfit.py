@@ -1,5 +1,5 @@
-import math
-import cmath
+from math import ceil, exp, log, log2, pi
+from cmath import phase
 import warnings
 
 import numpy
@@ -10,7 +10,7 @@ except ModuleNotFoundError as e:
     JAXNotFoundError = e
 
 
-class mcfit(object):
+class mcfit:
     r"""Compute integral transforms as a multiplicative convolution.
 
     The generic form is
@@ -70,6 +70,8 @@ class mcfit(object):
         padded `x`
     _y_ : (N,) ndarray
         padded `y`
+    Delta : float
+        log spacing of `x` and `y`
     xy : float
         reciprocal product
     prefac : array_like
@@ -169,32 +171,32 @@ class mcfit(object):
     def _setup(self):
         if self.Nin < 2:
             raise ValueError(f"input size {self.Nin} must not be smaller than 2")
-        Delta = math.log(self.x[-1] / self.x[0]) / (self.Nin - 1)
+        self.Delta = log(self.x[-1] / self.x[0]) / (self.Nin - 1)
         x_head = self.x[:8]
-        if not self.np.allclose(self.np.log(x_head[1:] / x_head[:-1]), Delta,
+        if not self.np.allclose(self.np.log(x_head[1:] / x_head[:-1]), self.Delta,
                                 rtol=1e-3):
             warnings.warn("input must be log-spaced")
 
         if isinstance(self.N, complex):
-            folds = math.ceil(math.log2(self.Nin * self.N.imag))
+            folds = ceil(log2(self.Nin * self.N.imag))
             self.N = 2**folds
         if self.N < self.Nin:
             raise ValueError(f"convolution size {self.N} must not be smaller than "
                              f"the input size {self.Nin}")
 
         if self.lowring and self.N % 2 == 0:
-            lnxy = Delta / math.pi * cmath.phase(self.MK(self.q + 1j * math.pi / Delta))
-            self.xy = math.exp(lnxy)
+            lnxy = self.Delta / pi * phase(self.MK(self.q + 1j * pi / self.Delta))
+            self.xy = exp(lnxy)
         else:
-            lnxy = math.log(self.xy)
-        self.y = math.exp(lnxy - Delta) / self.x[::-1]
+            lnxy = log(self.xy)
+        self.y = exp(lnxy - self.Delta) / self.x[::-1]
 
         self._x_ = self._pad(self.x, 0, True, False)
         self._y_ = self._pad(self.y, 0, True, True)
 
         m = numpy.arange(0, self.N//2 + 1)
-        self._u = self.MK(self.q + 2j * math.pi / self.N / Delta * m)
-        self._u *= numpy.exp(-2j * math.pi * lnxy / self.N / Delta * m)
+        self._u = self.MK(self.q + 2j * pi / self.N / self.Delta * m)
+        self._u *= numpy.exp(-2j * pi * lnxy / self.N / self.Delta * m)
         self._u = self.np.asarray(self._u, dtype=(self.x[0] + 0j).dtype)
 
         # following is unnecessary because hfft ignores the imag at Nyquist anyway
@@ -286,7 +288,7 @@ class mcfit(object):
         Returns
         -------
         If full is False, output separately
-        a : (1, N) or (1, Nin) ndarray
+        a : (N, 1) or (Nin, 1) ndarray
             "After" factor, `_yfac_` or `yfac`
         b : (N,) or (Nin,) ndarray
             "Before" factor, `_xfac_` or `xfac`
