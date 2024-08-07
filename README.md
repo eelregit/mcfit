@@ -4,14 +4,20 @@
 ## Features
 
 * Compute integral transforms:
+
   $$G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x;$$
+
 * Inverse transform without analytic inversion;
 * Integral kernels as derivatives:
+
   $$G(y) = \int_0^\infty F(x) K'(xy) \frac{dx}x;$$
+
 * Transform input array along any axis of `ndarray`;
 * Output the matrix form;
 * 1-to-n transform for multiple kernels (TODO):
+
   $$G(y_1, \cdots, y_n) = \int_0^\infty \frac{dx}x F(x) \prod_{a=1}^n K_a(xy_a);$$
+
 * Easily extensible for other kernels;
 * Support NumPy and JAX.
 
@@ -19,11 +25,15 @@
 ## Algorithm
 
 `mcfit` computes integral transforms of the form
+
   $$G(y) = \int_0^\infty F(x) K(xy) \frac{dx}x$$
+
 where $F(x)$ is the input function, $G(y)$ is the output function, and
 $K(xy)$ is the integral kernel.
 One is free to scale all three functions by a power law
+
   $$g(y) = \int_0^\infty f(x) k(xy) \frac{dx}x$$
+
 where $f(x)=x^{-q} F(x)$, $g(y)=y^q G(y)$, and $k(t)=t^q K(t)$.
 And $q$ is a tilt parameter serving to shift power of $x$ between the
 input function and the kernel.
@@ -57,7 +67,9 @@ Also see `doc/mcfit.tex` for more explanations.
 ## Examples
 
 One can perform the following pair of Hankel transforms
+
   $$e^{-y} = \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx, \quad (1+y^2)^{-\frac32} = \int_0^\infty e^{-x} J_0(xy) x dx$$
+
 easily as follows
 ```python
   def F_fun(x):
