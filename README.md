@@ -96,9 +96,9 @@ To use JAX instead of the default numpy backend:
   H_jit = jax.jit(functools.partial(H, extrap=True))
   y, G = H_jit(F)
 ```
-While it's not necessary to apply jit or other JAX transforms to the
-constructor, one should not do it because of the scipy special functions
-in there.
+It is not necessary to apply jit or other JAX transforms to the
+constructor, and one should not do it because of the scipy special
+functions in there.
 
 Cosmologists often need to transform a power spectrum to its correlation
 function
