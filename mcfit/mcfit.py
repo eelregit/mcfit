@@ -3,9 +3,11 @@ from cmath import phase
 import warnings
 
 import numpy
+_has_jax = False
 try:
     import jax
     jax.config.update("jax_enable_x64", True)
+    _has_jax = True
 except ModuleNotFoundError as e:
     JAXNotFoundError = e
 
@@ -124,6 +126,8 @@ class mcfit:
         if backend == 'numpy':
             self.np = numpy
             #self.jit = lambda fun: fun  # TODO maybe use Numba?
+            if _has_jax:
+                warnings.warn("use backend='jax' if desired")
         elif backend == 'jax':
             try:
                 self.np = jax.numpy
@@ -131,7 +135,7 @@ class mcfit:
             except NameError:
                 raise JAXNotFoundError
         else:
-            raise ValueError(f"backend {backend} not supported")
+            raise ValueError(f"{backend=} not supported")
 
         #self.__call__ = self.jit(self.__call__)
         #self.matrix = self.jit(self.matrix)
@@ -170,7 +174,7 @@ class mcfit:
 
     def _setup(self):
         if self.Nin < 2:
-            raise ValueError(f"input size {self.Nin} must not be smaller than 2")
+            raise ValueError(f"input size {self.Nin=} must not be smaller than 2")
         self.Delta = log(self.x[-1] / self.x[0]) / (self.Nin - 1)
         x_head = self.x[:8]
         if not self.np.allclose(self.np.log(x_head[1:] / x_head[:-1]), self.Delta,
@@ -181,8 +185,8 @@ class mcfit:
             folds = ceil(log2(self.Nin * self.N.imag))
             self.N = 2**folds
         if self.N < self.Nin:
-            raise ValueError(f"convolution size {self.N} must not be smaller than "
-                             f"the input size {self.Nin}")
+            raise ValueError(f"convolution size {self.N=} must not be smaller than "
+                             f"the input size {self.Nin=}")
 
         if self.lowring and self.N % 2 == 0:
             lnxy = self.Delta / pi * phase(self.MK(self.q + 1j * pi / self.Delta))
