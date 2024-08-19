@@ -53,7 +53,7 @@ $\ln x$.
 ## Installation
 
 ```sh
-  pip install mcfit
+pip install mcfit
 ```
 
 
@@ -72,29 +72,29 @@ One can perform the following pair of Hankel transforms
 
 easily as follows
 ```python
-  def F_fun(x):
-      return 1 / (1 + x*x)**1.5
-  def G_fun(y):
-      return numpy.exp(-y)
+def F_fun(x):
+    return 1 / (1 + x*x)**1.5
+def G_fun(y):
+    return numpy.exp(-y)
 
-  x = numpy.logspace(-3, 3, num=60, endpoint=False)
-  F = F_fun(x)
-  H = mcfit.Hankel(x, lowring=True)
-  y, G = H(F, extrap=True)
-  numpy.allclose(G, G_fun(y), rtol=1e-8, atol=1e-8)
+x = numpy.logspace(-3, 3, num=60, endpoint=False)
+F = F_fun(x)
+H = mcfit.Hankel(x, lowring=True)
+y, G = H(F, extrap=True)
+numpy.allclose(G, G_fun(y), rtol=1e-8, atol=1e-8)
 
-  y = numpy.logspace(-4, 2, num=60, endpoint=False)
-  G = G_fun(y)
-  H_inv = mcfit.Hankel(y, lowring=True)
-  x, F = H_inv(G, extrap=True)
-  numpy.allclose(F, F_fun(x), rtol=1e-10, atol=1e-10)
+y = numpy.logspace(-4, 2, num=60, endpoint=False)
+G = G_fun(y)
+H_inv = mcfit.Hankel(y, lowring=True)
+x, F = H_inv(G, extrap=True)
+numpy.allclose(F, F_fun(x), rtol=1e-10, atol=1e-10)
 ```
 
 To use JAX instead of the default numpy backend:
 ```python
-  H = mcfit.Hankel(x, lowring=True, backend='jax')  # do not jit
-  H_jit = jax.jit(functools.partial(H, extrap=True))
-  y, G = H_jit(F)
+H = mcfit.Hankel(x, lowring=True, backend='jax')  # do not jit
+H_jit = jax.jit(functools.partial(H, extrap=True))
+y, G = H_jit(F)
 ```
 It is not necessary to apply jit or other JAX transforms to the
 constructor, and one should not do it because of the scipy special
@@ -103,26 +103,26 @@ functions in there.
 Cosmologists often need to transform a power spectrum to its correlation
 function
 ```python
-  k, P = numpy.loadtxt('P.txt', unpack=True)
-  r, xi = mcfit.P2xi(k)(P)
+k, P = numpy.loadtxt('P.txt', unpack=True)
+r, xi = mcfit.P2xi(k)(P)
 ```
 and the other way around
 ```python
-  r, xi = numpy.loadtxt('xi.txt', unpack=True)
-  k, P = mcfit.xi2P(r)(xi)
+r, xi = numpy.loadtxt('xi.txt', unpack=True)
+k, P = mcfit.xi2P(r)(xi)
 ```
 
 Similarly for the quadrupoles
 ```python
-  k, P2 = numpy.loadtxt('P2.txt', unpack=True)
-  r, xi2 = mcfit.P2xi(k, l=2)(P2)
+k, P2 = numpy.loadtxt('P2.txt', unpack=True)
+r, xi2 = mcfit.P2xi(k, l=2)(P2)
 ```
 
 Also useful to the cosmologists is the tool below that computes the
 variance of the overdensity field as a function of radius, from which
 $\sigma_8$ can be interpolated.
 ```python
-  R, var = mcfit.TophatVar(k, lowring=True)(P, extrap=True)
-  varR = scipy.interpolate.CubicSpline(R, var)
-  sigma8 = numpy.sqrt(varR(8))
+R, var = mcfit.TophatVar(k, lowring=True)(P, extrap=True)
+varR = scipy.interpolate.CubicSpline(R, var)
+sigma8 = numpy.sqrt(varR(8))
 ```
