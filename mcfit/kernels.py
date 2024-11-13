@@ -7,7 +7,7 @@ except ImportError:
         return log(gamma(x))
 
 def _deriv(MK, deriv):
-    """Real deriv is wrt :math:`t`, complex deriv is wrt :math:`\ln t`"""
+    r"""Real deriv is wrt :math:`t`, complex deriv is wrt :math:`\ln t`"""
     if deriv == 0:
         return MK
 

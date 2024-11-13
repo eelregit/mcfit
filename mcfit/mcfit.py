@@ -6,7 +6,6 @@ import numpy
 _has_jax = False
 try:
     import jax
-    jax.config.update("jax_enable_x64", True)
     _has_jax = True
 except ModuleNotFoundError as e:
     JAXNotFoundError = e
