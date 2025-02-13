@@ -68,7 +68,7 @@ Also see `doc/mcfit.tex` for more explanations.
 
 One can perform the following pair of Hankel transforms
 
-  $$e^{-y} = \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx, \quad (1+y^2)^{-\frac32} = \int_0^\infty e^{-x} J_0(xy) x dx$$
+  $$e^{-y} = \int_0^\infty (1+x^2)^{-\frac32} J_0(xy) x dx, \quad (1+x^2)^{-\frac32} = \int_0^\infty e^{-y} J_0(xy) y dy$$
 
 easily as follows
 ```python
@@ -96,9 +96,10 @@ H = mcfit.Hankel(x, lowring=True, backend='jax')  # do not jit
 H_jit = jax.jit(functools.partial(H, extrap=True))
 y, G = H_jit(F)
 ```
-It is not necessary to apply jit or other JAX transforms to the
-constructor, and one should not do it because of the scipy special
-functions in there.
+Most of the time one does not need to apply `jit` or other JAX
+transforms to the constructor.
+By forbidding this, `mcfit` allows the constructor to use any special
+function implementations available in Python with the `'jax'` backend.
 
 Cosmologists often need to transform a power spectrum to its correlation
 function
@@ -118,9 +119,9 @@ k, P2 = numpy.loadtxt('P2.txt', unpack=True)
 r, xi2 = mcfit.P2xi(k, l=2)(P2)
 ```
 
-Also useful to the cosmologists is the tool below that computes the
-variance of the overdensity field as a function of radius, from which
-$\sigma_8$ can be interpolated.
+Also useful to cosmologists is the tool below that computes the variance
+of the overdensity field as a function of radius, from which $\sigma_8$
+can be interpolated.
 ```python
 R, var = mcfit.TophatVar(k, lowring=True)(P, extrap=True)
 varR = scipy.interpolate.CubicSpline(R, var)
