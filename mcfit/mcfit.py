@@ -55,7 +55,9 @@ class mcfit:
         `x.max()` by one log interval due to the discretization of the periodic
         approximant, and likewise for :math:`y_{max}`
     backend : str in {'numpy', 'jax'}, optional
-        Which backend to use.
+        Which backend to use for the transformation in `__call__`, whereas the instance
+        is still constructed with `numpy`, `scipy`, etc. Therefore don't JAX-transform
+        `__init__` with, e.g., `jax.jit`.
 
     Attributes
     ----------
